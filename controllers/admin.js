@@ -6,16 +6,11 @@ const {
 	borrarSolicitud,
 } = require("../database/querys");
 const moment = require("moment");
+const { enviarMail } = require("../helpers/nodemailer");
 
 const traerSolicitudes = async (req, res) => {
 	try {
 		const datos = await listaSolicitudes();
-		// if (datos.length === 0) {
-		// 	return res.status(400).json({
-		// 		msg: "No hay solicitudes pendientes",
-		// 		ok: false,
-		// 	});
-		// }
 		res.status(200).json({
 			datos,
 			msg: "Datos cargados con exito",
@@ -63,6 +58,8 @@ const crearUsuario = async (req, res) => {
 			await insertarUsuario(Object.values(datosCrear));
 		}
 		await borrarSolicitud([id_solicitud]);
+		// enviar email
+		enviarMail("acept", email, "Has sido aceptado!", { nombre, contraseña });
 
 		res.status(200).json({
 			msg: "Cliente ha sido aceptado",
