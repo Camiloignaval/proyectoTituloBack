@@ -32,36 +32,6 @@ const enviarSolicitud = async (datos) => {
 	}
 };
 
-const insertarUsuario = async (data) => {
-	const query = `insert into usuarios
-	(nombre, apellido, fecha_nacimiento, contraseña, email, rut, id_direccion, id_cargo)
-	VALUES($1, $2, $3, $4, $5, $6, (select d.id_direccion from direcciones d 
-		where d.calle=$7 
-		and d.id_comuna=(select c.id_comuna from comunas c where c.nombre=$9)), $8) returning *;
-	`;
-	try {
-		const res = await pool.query(query, data);
-		pool.end;
-		return res.rows;
-	} catch (error) {
-		console.log(error);
-	}
-};
-
-const insertarDireccion = async (data) => {
-	const query = `insert into direcciones
-	(calle, id_comuna)
-	VALUES($1, (select c.id_comuna from comunas c where c.nombre = $2)) returning *;
-	`;
-	try {
-		const res = await pool.query(query, data);
-		pool.end;
-		return res.rows;
-	} catch (error) {
-		console.log(error);
-	}
-};
-
 const buscarUsuarioPorRutdeClientes = async (rut) => {
 	const query = `SELECT u.nombre FROM usuarios u where u.rut=$1;
 	`;
@@ -85,7 +55,7 @@ const buscarUsuarioPorenSolicitudes = async (rut) => {
 
 const existeDireccion = async (datos) => {
 	const query = `select count(d.id_direccion) from direcciones d where d.calle=$1 
-	and d.id_comuna=(select c.id_comuna from comunas c where c.nombre=$2)`;
+	and d.id_comuna=(select c.id_comuna from comunas c where c.nombre_comuna=$2)`;
 
 	try {
 		const res = await pool.query(query, datos);
@@ -106,13 +76,76 @@ const borrarSolicitud = async (id) => {
 		console.log(error);
 	}
 };
+
+const insertarUsuarioSinDireccion = async (datos, id) => {
+	try {
+		await pool.query("BEGIN");
+		const queryInsert = `insert into usuarios
+	(nombre, apellido, fecha_nacimiento, contraseña, email, rut, id_direccion, id_cargo,bloqueado)
+	VALUES($1, $2, $3, $4, $5, $6, (select d.id_direccion from direcciones d 
+		where d.calle=$7 
+		and d.id_comuna=(select c.id_comuna from comunas c where c.nombre_comuna=$9)), $8,false) returning *;
+	`;
+		const res = await pool.query(queryInsert, datos);
+		const del = `delete from solicitudes
+	WHERE id_solicitud=$1;
+	`;
+		await pool.query(del, id);
+		await pool.query("COMMIT");
+	} catch (error) {
+		await pool.query("ROLLBACK");
+		console.log(error);
+	}
+};
+
+const insertarUsuarioConDireccion = async (direccion, datos, id) => {
+	try {
+		await pool.query("BEGIN");
+		const dir = `insert into direcciones
+		(calle, id_comuna)
+		VALUES($1, (select c.id_comuna from comunas c where c.nombre_comuna = $2)) returning *;
+		`;
+		await pool.query(dir, direccion);
+		const queryInsert = `insert into usuarios
+	(nombre, apellido, fecha_nacimiento, contraseña, email, rut, id_direccion, id_cargo,bloqueado)
+	VALUES($1, $2, $3, $4, $5, $6, (select d.id_direccion from direcciones d 
+		where d.calle=$7 
+		and d.id_comuna=(select c.id_comuna from comunas c where c.nombre_comuna=$9)), $8,false) returning *;
+	`;
+		const res = await pool.query(queryInsert, datos);
+		const del = `delete from solicitudes
+	WHERE id_solicitud=$1;
+	`;
+		await pool.query(del, id);
+		await pool.query("COMMIT");
+	} catch (error) {
+		await pool.query("ROLLBACK");
+		console.log(error);
+	}
+};
+
+const selectClientes = async () => {
+	const query = `select * from usuarios u inner join
+	direcciones d on
+	d.id_direccion=u.id_direccion
+	inner join comunas c
+	on d.id_comuna=c.id_comuna
+	 where id_cargo=3`;
+	try {
+		const res = await pool.query(query);
+		return res.rows;
+	} catch (error) {
+		console.log(error);
+	}
+};
 module.exports = {
 	listaSolicitudes,
 	enviarSolicitud,
-	insertarUsuario,
-	insertarDireccion,
 	buscarUsuarioPorRutdeClientes,
 	buscarUsuarioPorenSolicitudes,
 	existeDireccion,
 	borrarSolicitud,
+	insertarUsuarioSinDireccion,
+	insertarUsuarioConDireccion,
+	selectClientes,
 };

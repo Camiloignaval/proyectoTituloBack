@@ -1,9 +1,10 @@
 const {
 	listaSolicitudes,
-	insertarUsuario,
-	insertarDireccion,
 	existeDireccion,
+	insertarUsuarioSinDireccion,
+	insertarUsuarioConDireccion,
 	borrarSolicitud,
+	selectClientes,
 } = require("../database/querys");
 const moment = require("moment");
 const { enviarMail } = require("../helpers/nodemailer");
@@ -52,12 +53,15 @@ const crearUsuario = async (req, res) => {
 		const buscacalle = await existeDireccion([calle, comuna]);
 		if (buscacalle[0].count > 0) {
 			console.log("Direccion ya existe");
-			await insertarUsuario(Object.values(datosCrear));
+			insertarUsuarioSinDireccion(Object.values(datosCrear), [id_solicitud]);
 		} else {
-			await insertarDireccion([calle, comuna]);
-			await insertarUsuario(Object.values(datosCrear));
+			await insertarUsuarioConDireccion(
+				[calle, comuna],
+				Object.values(datosCrear),
+				[id_solicitud],
+			);
 		}
-		await borrarSolicitud([id_solicitud]);
+
 		// enviar email
 		enviarMail("acept", email, "Has sido aceptado!", { nombre, contraseña });
 
@@ -73,7 +77,48 @@ const crearUsuario = async (req, res) => {
 	}
 };
 
+const eliminarSolicitud = async (req, res) => {
+	try {
+		const { id_solicitud } = req.body;
+		await borrarSolicitud([id_solicitud]);
+		res.status(200).json({
+			msg: "Solicitud rechazada correctamente",
+			ok: true,
+		});
+	} catch (error) {
+		res.status(400).json({
+			msg: "Ha ocurrido un error, no se pudo realizar la acción",
+			ok: false,
+		});
+	}
+};
+
+const traerUsuarios = async (req, res) => {
+	try {
+		const datos = await selectClientes();
+		if (datos.length === 0) {
+			return res.status(200).json({
+				msg: "No hay clientes en nuestra base de datos",
+				ok: false,
+			});
+		}
+		res.status(200).json({
+			datos,
+			msg: "Clientes cargados con exito",
+			ok: true,
+		});
+	} catch (error) {
+		console.log(error);
+		res.status(200).json({
+			msg: "Ha ocurrido un error",
+			ok: false,
+		});
+	}
+};
+
 module.exports = {
 	traerSolicitudes,
 	crearUsuario,
+	eliminarSolicitud,
+	traerUsuarios,
 };
