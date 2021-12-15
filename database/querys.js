@@ -33,7 +33,7 @@ const enviarSolicitud = async (datos) => {
 };
 
 const buscarUsuarioPorRutdeClientes = async (rut) => {
-	const query = `SELECT u.nombre FROM usuarios u where u.rut=$1;
+	const query = `SELECT * FROM usuarios u where u.rut=$1;
 	`;
 	try {
 		const res = await pool.query(query, rut);

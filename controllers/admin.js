@@ -9,6 +9,7 @@ const {
 } = require("../database/querys");
 const moment = require("moment");
 const { enviarMail } = require("../helpers/nodemailer");
+const bcrypt = require("bcrypt");
 
 const traerSolicitudes = async (req, res) => {
 	try {
@@ -49,6 +50,13 @@ const crearUsuario = async (req, res) => {
 		rango: 3,
 		comuna,
 	};
+
+	// encriptando contraseña
+
+	const hash = bcrypt.hashSync(contraseña, bcrypt.genSaltSync(10));
+	datosCrear.contraseña = hash;
+
+	console.log("la contraseña a guardar es:", datosCrear.contraseña);
 
 	try {
 		const buscacalle = await existeDireccion([calle, comuna]);
@@ -131,7 +139,7 @@ const intercambiarBloqueo = async (req, res) => {
 			msg: "Usuario ha sido desbloqueado",
 			ok: true,
 		});
-	} catch (error) { 	
+	} catch (error) {
 		console.log(error);
 		res.status(400).json({
 			msg: "Ha ocurrido un error",
