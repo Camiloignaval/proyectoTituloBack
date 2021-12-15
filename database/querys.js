@@ -138,6 +138,18 @@ const selectClientes = async () => {
 		console.log(error);
 	}
 };
+
+const toggleBloqueoUsuario = async (datos) => {
+	const query = `update usuarios
+  SET bloqueado=$2
+  WHERE id_usuario=$1;`;
+	try {
+		const res = await pool.query(query, datos);
+		return res.rows;
+	} catch (error) {
+		console.log(error);
+	}
+};
 module.exports = {
 	listaSolicitudes,
 	enviarSolicitud,
@@ -148,4 +160,5 @@ module.exports = {
 	insertarUsuarioSinDireccion,
 	insertarUsuarioConDireccion,
 	selectClientes,
+	toggleBloqueoUsuario,
 };

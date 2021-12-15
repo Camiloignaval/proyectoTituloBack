@@ -5,6 +5,7 @@ const {
 	insertarUsuarioConDireccion,
 	borrarSolicitud,
 	selectClientes,
+	toggleBloqueoUsuario,
 } = require("../database/querys");
 const moment = require("moment");
 const { enviarMail } = require("../helpers/nodemailer");
@@ -109,7 +110,30 @@ const traerUsuarios = async (req, res) => {
 		});
 	} catch (error) {
 		console.log(error);
+		res.status(400).json({
+			msg: "Ha ocurrido un error",
+			ok: false,
+		});
+	}
+};
+
+const intercambiarBloqueo = async (req, res) => {
+	const data = req.body;
+	try {
+		await toggleBloqueoUsuario(Object.values(data));
+		if (data.bloquear) {
+			return res.status(200).json({
+				msg: "Usuario ha sido bloqueado",
+				ok: true,
+			});
+		}
 		res.status(200).json({
+			msg: "Usuario ha sido desbloqueado",
+			ok: true,
+		});
+	} catch (error) { 	
+		console.log(error);
+		res.status(400).json({
 			msg: "Ha ocurrido un error",
 			ok: false,
 		});
@@ -121,4 +145,5 @@ module.exports = {
 	crearUsuario,
 	eliminarSolicitud,
 	traerUsuarios,
+	intercambiarBloqueo,
 };
