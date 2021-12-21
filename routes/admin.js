@@ -6,10 +6,14 @@ const {
 	traerUsuarios,
 	intercambiarBloqueo,
 } = require("../controllers/admin");
+const { validarJWT } = require("../middlewares/validarJWT");
 const router = Router();
 
 // BASE /api/admin/
-// obtener solicitudes
+
+// Middleware para todas las rutas
+router.use(validarJWT);
+
 router.get("/requests", traerSolicitudes);
 router.delete("/requests", eliminarSolicitud);
 

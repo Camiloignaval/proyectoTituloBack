@@ -8,8 +8,19 @@ const bcrypt = require("bcrypt");
 const { generarJWT } = require("../helpers/jwt");
 
 const envioSolicitud = async (req, res) => {
-	const { name, lastName, date, adress, comuna, region, rut, email, pass1 } =
-		req.body;
+	console.log(req.body);
+	const {
+		name,
+		lastName,
+		date,
+		adress,
+		comuna,
+		region,
+		rut,
+		email,
+		pass1,
+		telefono,
+	} = req.body;
 	try {
 		const cliente = await buscarUsuarioPorRutdeClientes([rut]);
 		const solicitud = await buscarUsuarioPorenSolicitudes([rut]);
@@ -36,6 +47,7 @@ const envioSolicitud = async (req, res) => {
 					rut,
 					email,
 					pass1,
+					telefono,
 				}),
 			);
 			res.status(200).json({
@@ -56,7 +68,6 @@ const login = async (req, res) => {
 	const { rut: rutReq, password } = req.body;
 	try {
 		const resp = await buscarUsuarioPorRutdeClientes([rutReq]);
-		console.log(resp);
 		const {
 			contraseña: contraseñaBBDD,
 			id_usuario,
@@ -69,7 +80,7 @@ const login = async (req, res) => {
 		} = resp[0];
 		const comprobacion = bcrypt.compareSync(password, contraseñaBBDD);
 		if (comprobacion) {
-			const token = generarJWT(id_usuario, nombre);
+			const token = await generarJWT(id_usuario, id_cargo, rut);
 			res.status(200).json({
 				ok: true,
 				token,
@@ -98,7 +109,37 @@ const login = async (req, res) => {
 	}
 };
 
+const revalidarToken = async (req, res = response) => {
+	const { uid, cid, rut: rutConsulta } = req;
+	// generar nuevo jwt
+	const token = await generarJWT(uid, cid, rutConsulta);
+	const data = await buscarUsuarioPorRutdeClientes([rutConsulta]);
+	const {
+		id_usuario,
+		nombre,
+		apellido,
+		fecha_nacimiento,
+		email,
+		rut,
+		id_cargo,
+	} = data[0];
+	res.json({
+		ok: true,
+		token,
+		data: {
+			id_usuario,
+			nombre,
+			apellido,
+			fecha_nacimiento,
+			email,
+			rut,
+			id_cargo,
+		},
+	});
+};
+
 module.exports = {
 	envioSolicitud,
 	login,
+	revalidarToken,
 };

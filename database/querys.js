@@ -21,8 +21,8 @@ const listaSolicitudes = async () => {
 const enviarSolicitud = async (datos) => {
 	try {
 		const query = `insert into solicitudes
-		(nombre, apellido, fecha_nacimiento, calle, comuna, region, rut, email, contraseña)
-		VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9);
+		(nombre, apellido, fecha_nacimiento, calle, comuna, region, rut, email, contraseña,telefono)
+		VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9,$10);
 		`;
 		const res = await pool.query(query, datos);
 		pool.end;
@@ -81,8 +81,8 @@ const insertarUsuarioSinDireccion = async (datos, id) => {
 	try {
 		await pool.query("BEGIN");
 		const queryInsert = `insert into usuarios
-	(nombre, apellido, fecha_nacimiento, contraseña, email, rut, id_direccion, id_cargo,bloqueado)
-	VALUES($1, $2, $3, $4, $5, $6, (select d.id_direccion from direcciones d 
+	(nombre, apellido, fecha_nacimiento, contraseña, email, rut,telefono, id_direccion, id_cargo,bloqueado)
+	VALUES($1, $2, $3, $4, $5, $6,$10, (select d.id_direccion from direcciones d 
 		where d.calle=$7 
 		and d.id_comuna=(select c.id_comuna from comunas c where c.nombre_comuna=$9)), $8,false) returning *;
 	`;
@@ -107,8 +107,8 @@ const insertarUsuarioConDireccion = async (direccion, datos, id) => {
 		`;
 		await pool.query(dir, direccion);
 		const queryInsert = `insert into usuarios
-	(nombre, apellido, fecha_nacimiento, contraseña, email, rut, id_direccion, id_cargo,bloqueado)
-	VALUES($1, $2, $3, $4, $5, $6, (select d.id_direccion from direcciones d 
+	(nombre, apellido, fecha_nacimiento, contraseña, email, rut,telefono, id_direccion, id_cargo,bloqueado)
+	VALUES($1, $2, $3, $4, $5, $6,$10, (select d.id_direccion from direcciones d 
 		where d.calle=$7 
 		and d.id_comuna=(select c.id_comuna from comunas c where c.nombre_comuna=$9)), $8,false) returning *;
 	`;

@@ -38,6 +38,7 @@ const crearUsuario = async (req, res) => {
 		rut,
 		comuna,
 		calle,
+		telefono,
 	} = req.body;
 	const datosCrear = {
 		nombre,
@@ -49,15 +50,13 @@ const crearUsuario = async (req, res) => {
 		calle,
 		rango: 3,
 		comuna,
+		telefono,
 	};
 
 	// encriptando contraseña
 
 	const hash = bcrypt.hashSync(contraseña, bcrypt.genSaltSync(10));
 	datosCrear.contraseña = hash;
-
-	console.log("la contraseña a guardar es:", datosCrear.contraseña);
-
 	try {
 		const buscacalle = await existeDireccion([calle, comuna]);
 		if (buscacalle[0].count > 0) {
@@ -127,6 +126,10 @@ const traerUsuarios = async (req, res) => {
 
 const intercambiarBloqueo = async (req, res) => {
 	const data = req.body;
+	const token = req.header("x-token");
+	// const uid = req.uid;
+	// const cid = req.cid;
+	// const name = req.name;
 	try {
 		await toggleBloqueoUsuario(Object.values(data));
 		if (data.bloquear) {
