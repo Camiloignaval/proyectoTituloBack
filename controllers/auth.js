@@ -1,64 +1,64 @@
 const {
-	enviarSolicitud,
 	buscarUsuarioPorRutdeClientes,
-	buscarUsuarioPorenSolicitudes,
+	insertarUsuario,
 } = require("../database/querys");
-const moment = require("moment");
 const bcrypt = require("bcrypt");
 const { generarJWT } = require("../helpers/jwt");
+// const { parse } = require("dotenv");
 
-const envioSolicitud = async (req, res) => {
-	console.log(req.body);
+const crearUsuario = async (req, res) => {
 	const {
+		type,
 		name,
 		lastName,
 		date,
-		adress,
-		comuna,
-		region,
 		rut,
 		email,
-		pass1,
+		pass1: pass,
+		adress,
+		numero,
+		piso,
+		depto,
+		comuna,
 		telefono,
 	} = req.body;
+	const datosCrear = {
+		type,
+		name,
+		lastName,
+		date,
+		rut,
+		email,
+		pass,
+		adress,
+		numero: parseInt(numero),
+		piso: parseInt(piso) ? parseInt(piso) : null,
+		depto: parseInt(depto) ? parseInt(depto) : null,
+		comuna,
+		telefono,
+	};
+	// encriptando contraseña
+
+	const hash = bcrypt.hashSync(pass, bcrypt.genSaltSync(10));
+	datosCrear.pass = hash;
 	try {
 		const cliente = await buscarUsuarioPorRutdeClientes([rut]);
-		const solicitud = await buscarUsuarioPorenSolicitudes([rut]);
-
 		if (cliente.length === 1) {
 			return res.status(400).json({
 				msg: "Rut ya se encuentra registrado",
 				ok: false,
 			});
-		} else if (solicitud.length === 1) {
-			res.status(400).json({
-				msg: "Rut ya cuenta con una solicitud por aprobar",
-				ok: false,
-			});
 		} else {
-			const datos = await enviarSolicitud(
-				Object.values({
-					name,
-					lastName,
-					fecha: moment(date).format("DD-MM-YYYY"),
-					adress,
-					comuna,
-					region,
-					rut,
-					email,
-					pass1,
-					telefono,
-				}),
-			);
+			await insertarUsuario(Object.values(datosCrear));
+
 			res.status(200).json({
-				msg: "Se ha enviado tu solicitud con éxito!",
+				msg: `Estimad@ ${name}, nos pondremos en contacto con usted cuando su solicitud sea procesada`,
 				ok: true,
 			});
 		}
 	} catch (error) {
-		console.log(error);
-		res.status(401).json({
-			msg: "Ha ocurrido un error",
+		res.status(400).json({
+			msg: "Ha ocurrido un error, no se pudo realizar la acción",
 			ok: false,
 		});
 	}
@@ -139,7 +139,7 @@ const revalidarToken = async (req, res = response) => {
 };
 
 module.exports = {
-	envioSolicitud,
+	crearUsuario,
 	login,
 	revalidarToken,
 };

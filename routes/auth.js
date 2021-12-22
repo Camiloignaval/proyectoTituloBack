@@ -3,11 +3,12 @@ const {
 	envioSolicitud,
 	login,
 	revalidarToken,
+	crearUsuario,
 } = require("../controllers/auth");
 const { validarJWT } = require("../middlewares/validarJWT");
 const router = Router();
 
-router.post("/register", envioSolicitud);
+router.post("/user", crearUsuario);
 router.post("/", login);
 router.get("/renew", validarJWT, revalidarToken);
 
