@@ -18,35 +18,13 @@ const buscarUsuarioPorRutdeClientes = async (rut) => {
 		console.log(error);
 	}
 };
-// const buscarUsuarioPorenSolicitudes = async (rut) => {
-// 	const query = `SELECT s.nombre FROM solicitudes s where s.rut=$1;
-// 	`;
-// 	try {
-// 		const res = await pool.query(query, rut);
-// 		return res.rows;
-// 	} catch (error) {
-// 		console.log(error);
-// 	}
-// };
-
-// const borrarSolicitud = async (id) => {
-// 	const query = `delete from solicitudes
-// 	WHERE id_solicitud=$1;
-// 	`;
-// 	try {
-// 		const res = await pool.query(query, id);
-// 		return res.rows;
-// 	} catch (error) {
-// 		console.log(error);
-// 	}
-// };
 
 const insertarUsuario = async (datos) => {
 	try {
 		console.log(datos);
 		const queryUser = `INSERT INTO public.usuarios
-		(nombre, apellido, fecha_nacimiento, contraseña, email, rut, id_cargo, bloqueado, telefono, calle, num_direccion, piso, depto, id_comuna, solicitud_revisada)
-		VALUES($2,$3, $4, $7, $6, $5, $1, false, $13, $8, $9, $10, $11, (select c.id_comuna from comunas c where c.nombre_comuna=$12), false);
+		(nombre, apellido, fecha_nacimiento, contraseña, email, rut, id_cargo, bloqueado, telefono, calle, num_direccion, piso, depto, id_comuna, solicitud_revisada, foto)
+		VALUES($2,$3, $4, $7, $6, $5, $1, false, $13, $8, $9, $10, $11, (select c.id_comuna from comunas c where c.nombre_comuna=$12), false, 'https://d500.epimg.net/cincodias/imagenes/2016/07/04/lifestyle/1467646262_522853_1467646344_noticia_normal.jpg');
 		`;
 		const res = await pool.query(queryUser, datos);
 		return res.rows;
@@ -111,11 +89,39 @@ const rechazarSolicitud = async (data) => {
 		console.log(error);
 	}
 };
+
+const actualizarUsuario = async (data) => {
+	const query = `update usuarios
+  SET  foto=$1, telefono=$2,email=$3
+  WHERE id_usuario=$4;
+  `;
+	try {
+		const res = await pool.query(query, data);
+		return res.rows;
+	} catch (error) {
+		console.log(error);
+	}
+};
+
+const cambiarFechaBaja = async (datos) => {
+	const query = `update usuarios
+  SET  fecha_baja_usuario=(select now())
+  WHERE id_usuario=$1;
+  `;
+	try {
+		const res = await pool.query(query, datos);
+		return res.rows;
+	} catch (error) {
+		console.log(error);
+	}
+};
 module.exports = {
+	actualizarUsuario,
 	buscarUsuarioPorRutdeClientes,
 	insertarUsuario,
 	selectClientes,
 	toggleBloqueoUsuario,
 	aceptarSolicitud,
 	rechazarSolicitud,
+	cambiarFechaBaja,
 };

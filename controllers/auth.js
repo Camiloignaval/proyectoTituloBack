@@ -1,6 +1,8 @@
 const {
 	buscarUsuarioPorRutdeClientes,
 	insertarUsuario,
+	actualizarUsuario,
+	cambiarFechaBaja,
 } = require("../database/querys");
 const bcrypt = require("bcrypt");
 const { generarJWT } = require("../helpers/jwt");
@@ -77,6 +79,8 @@ const login = async (req, res) => {
 			email,
 			rut,
 			id_cargo,
+			foto,
+			telefono,
 		} = resp[0];
 		const comprobacion = bcrypt.compareSync(password, contraseñaBBDD);
 		if (comprobacion) {
@@ -92,6 +96,8 @@ const login = async (req, res) => {
 					email,
 					rut,
 					id_cargo,
+					foto,
+					telefono,
 				},
 			});
 		} else {
@@ -122,6 +128,8 @@ const revalidarToken = async (req, res = response) => {
 		email,
 		rut,
 		id_cargo,
+		foto,
+		telefono,
 	} = data[0];
 	res.json({
 		ok: true,
@@ -134,11 +142,48 @@ const revalidarToken = async (req, res = response) => {
 			email,
 			rut,
 			id_cargo,
+			foto,
+			telefono,
 		},
 	});
 };
 
+const modificarUsuario = async (req, res) => {
+	const body = req.body;
+	try {
+		const resp = await actualizarUsuario(Object.values(body));
+		res.status(200).json({
+			ok: true,
+			msg: "Datos actualizados con éxito",
+		});
+	} catch (error) {
+		res.status(400).json({
+			ok: false,
+			msg: "Ha ocurrido un error, intente más tarde",
+		});
+	}
+};
+
+const darUsuarioDeBaja = async (req, res) => {
+	const { id_usuario } = req.body;
+	try {
+		await cambiarFechaBaja(Object.values([id_usuario]));
+		res.status(200).json({
+			ok: true,
+			msg: "Tu perfil ha sido dado de baja",
+		});
+	} catch (error) {
+		console.log(error.message);
+		res.status(400).json({
+			ok: false,
+			msg: "Ha ocurrido un error, intente más tarde",
+		});
+	}
+};
+
 module.exports = {
+	darUsuarioDeBaja,
+	modificarUsuario,
 	crearUsuario,
 	login,
 	revalidarToken,
