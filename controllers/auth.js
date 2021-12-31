@@ -3,6 +3,7 @@ const {
 	insertarUsuario,
 	actualizarUsuario,
 	cambiarFechaBaja,
+	cambiarContraseña,
 } = require("../database/querys");
 const bcrypt = require("bcrypt");
 const { generarJWT } = require("../helpers/jwt");
@@ -181,10 +182,41 @@ const darUsuarioDeBaja = async (req, res) => {
 	}
 };
 
+const modificarContraseña = async (req, res) => {
+	const { passActual, passNuevo, rut } = req.body;
+	try {
+		// hasheando nueva contraseña
+		const hash = bcrypt.hashSync(passNuevo, bcrypt.genSaltSync(10));
+		// comprobando contraseña actual
+		const resp = await buscarUsuarioPorRutdeClientes([rut]);
+		const { contraseña } = resp[0];
+		const comprobacion = bcrypt.compareSync(passActual, contraseña);
+		if (!comprobacion) {
+			return res.status(400).json({
+				ok: false,
+				msg: "Contraseña actual es incorrecta",
+			});
+		} else {
+			await cambiarContraseña([rut, hash]);
+			return res.status(200).json({
+				ok: true,
+				msg: "Contraseña cambiada con éxito",
+			});
+		}
+	} catch (error) {
+		console.log(error);
+		return res.status(400).json({
+			ok: false,
+			msg: "Ha ocurrido un problema, intente en un momento",
+		});
+	}
+};
+
 module.exports = {
 	darUsuarioDeBaja,
 	modificarUsuario,
 	crearUsuario,
 	login,
 	revalidarToken,
+	modificarContraseña,
 };

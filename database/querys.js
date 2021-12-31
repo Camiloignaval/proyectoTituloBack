@@ -115,6 +115,19 @@ const cambiarFechaBaja = async (datos) => {
 		console.log(error);
 	}
 };
+
+const cambiarContraseña = async (datos) => {
+	const query = `update usuarios
+  SET contraseña=$2
+  WHERE rut=$1;
+  `;
+	try {
+		const res = await pool.query(query, datos);
+		return res.rows;
+	} catch (error) {
+		console.log(error);
+	}
+};
 module.exports = {
 	actualizarUsuario,
 	buscarUsuarioPorRutdeClientes,
@@ -124,4 +137,5 @@ module.exports = {
 	aceptarSolicitud,
 	rechazarSolicitud,
 	cambiarFechaBaja,
+	cambiarContraseña,
 };
