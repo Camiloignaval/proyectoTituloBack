@@ -82,8 +82,32 @@ const login = async (req, res) => {
 			id_cargo,
 			foto,
 			telefono,
+			solicitud_revisada,
+			fecha_baja_usuario,
+			bloqueado,
+			fecha_rechazo_usuario,
 		} = resp[0];
+		console.log(fecha_rechazo_usuario);
 		const comprobacion = bcrypt.compareSync(password, contraseñaBBDD);
+		// Si solicitud aun no ha sido aprobada
+		if (!solicitud_revisada) {
+			return res.status(400).json({
+				ok: false,
+				msg: "Tu solicitud aun no ha sido aprobada",
+			});
+			// Si cliente fue rechazado
+		} else if (solicitud_revisada && fecha_rechazo_usuario !== null) {
+			return res.status(400).json({
+				ok: false,
+				msg: "Tu solicitud ha sido rechazada, contacta a un adminsitrador",
+			});
+			// Si usuario se dio de baja, o fue bloqueado
+		} else if (fecha_baja_usuario !== null || bloqueado) {
+			return res.status(400).json({
+				ok: false,
+				msg: "Tu cuenta no esta activa, porfavor contacta a un administrados",
+			});
+		}
 		if (comprobacion) {
 			const token = await generarJWT(id_usuario, id_cargo, rut);
 			res.status(200).json({
