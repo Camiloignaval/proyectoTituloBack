@@ -128,6 +128,19 @@ const cambiarContraseña = async (datos) => {
 		console.log(error);
 	}
 };
+
+const changeImg = async (data) => {
+	const query = `update usuarios
+	SET foto=$1
+	WHERE id_usuario=$2;
+	`;
+	try {
+		const res = await pool.query(query, data);
+		return res.rows;
+	} catch (error) {
+		console.log(error);
+	}
+};
 module.exports = {
 	actualizarUsuario,
 	buscarUsuarioPorRutdeClientes,
@@ -138,4 +151,5 @@ module.exports = {
 	rechazarSolicitud,
 	cambiarFechaBaja,
 	cambiarContraseña,
+	changeImg,
 };

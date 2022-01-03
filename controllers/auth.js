@@ -4,6 +4,7 @@ const {
 	actualizarUsuario,
 	cambiarFechaBaja,
 	cambiarContraseña,
+	changeImg,
 } = require("../database/querys");
 const bcrypt = require("bcrypt");
 const { generarJWT } = require("../helpers/jwt");
@@ -87,7 +88,6 @@ const login = async (req, res) => {
 			bloqueado,
 			fecha_rechazo_usuario,
 		} = resp[0];
-		console.log(fecha_rechazo_usuario);
 		const comprobacion = bcrypt.compareSync(password, contraseñaBBDD);
 		// Si solicitud aun no ha sido aprobada
 		if (!solicitud_revisada) {
@@ -105,9 +105,10 @@ const login = async (req, res) => {
 		} else if (fecha_baja_usuario !== null || bloqueado) {
 			return res.status(400).json({
 				ok: false,
-				msg: "Tu cuenta no esta activa, porfavor contacta a un administrados",
+				msg: "Tu cuenta no esta activa, porfavor contacta a un administrador",
 			});
 		}
+		// Si comprobacion de credenciales han sido correctas
 		if (comprobacion) {
 			const token = await generarJWT(id_usuario, id_cargo, rut);
 			res.status(200).json({
@@ -125,6 +126,7 @@ const login = async (req, res) => {
 					telefono,
 				},
 			});
+			// Si credenciales son incorrectas
 		} else {
 			res.status(400).json({
 				ok: false,
@@ -236,7 +238,24 @@ const modificarContraseña = async (req, res) => {
 	}
 };
 
+const modificarImgPerfil = async (req, res) => {
+	const { url, id_usuario } = req.body;
+	try {
+		await changeImg([url, id_usuario]);
+		res.status(200).json({
+			ok: true,
+			msg: "Foto cambiada con éxito",
+		});
+	} catch (error) {
+		res.status(400).json({
+			ok: false,
+			msg: "Ha ocurrido un problema, intente en un momento",
+		});
+	}
+};
+
 module.exports = {
+	modificarImgPerfil,
 	darUsuarioDeBaja,
 	modificarUsuario,
 	crearUsuario,
