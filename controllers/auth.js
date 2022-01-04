@@ -10,6 +10,7 @@ const bcrypt = require("bcrypt");
 const { generarJWT } = require("../helpers/jwt");
 // const { parse } = require("dotenv");
 
+// creacion de usuario en bbdd
 const crearUsuario = async (req, res) => {
 	const {
 		type,

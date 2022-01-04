@@ -38,7 +38,7 @@ const selectClientes = async (estadoSolicitud) => {
 		? `select * from usuarios u inner join
 	comunas c on
 	c.id_comuna=u.id_comuna
-	where u.id_cargo=3 and u.fecha_rechazo_usuario is null`
+	where u.id_cargo=3 and u.fecha_rechazo_usuario is null and u.solicitud_revisada=true`
 		: `select * from usuarios u inner join
 	comunas c on
 	c.id_comuna=u.id_comuna where u.id_cargo !=1 and
@@ -92,8 +92,8 @@ const rechazarSolicitud = async (data) => {
 
 const actualizarUsuario = async (data) => {
 	const query = `update usuarios
-  SET  foto=$1, telefono=$2,email=$3
-  WHERE id_usuario=$4;
+  SET telefono=$1,email=$2
+  WHERE id_usuario=$3;
   `;
 	try {
 		const res = await pool.query(query, data);

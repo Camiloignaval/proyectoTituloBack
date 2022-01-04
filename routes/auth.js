@@ -11,6 +11,8 @@ const {
 const { validarJWT } = require("../middlewares/validarJWT");
 const router = Router();
 
+// BASE /api/auth/
+
 router.post("/user", crearUsuario);
 router.put("/user", modificarUsuario);
 router.delete("/user", darUsuarioDeBaja);

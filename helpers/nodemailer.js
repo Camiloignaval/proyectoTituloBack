@@ -1,6 +1,6 @@
 const nodemailer = require("nodemailer");
 
-const enviarMail = async (tipo, correo, subject, datos) => {
+const enviarMail = async (tipo, to, subject, datos, de=process.env.NODEMAILER_USER) => {
 	const transport = nodemailer.createTransport({
 		service: "Gmail",
 		auth: {
@@ -13,13 +13,12 @@ const enviarMail = async (tipo, correo, subject, datos) => {
 		// SI ES APROBADO
 		email = {
 			from: `Tu gimnasio! <${process.env.NODEMAILER_USER}>`, //remitente
-			to: correo, //destinatario
+			to, //destinatario
 			subject, //asunto del correo
 			text: ` 
          
            Estimado ${datos.nombre}
            Has sido aceptado para entrar en nuestra aplicación!
-           Tus contraseña para ingresar es: ${datos.contraseña}
      
              
         `,
@@ -29,7 +28,7 @@ const enviarMail = async (tipo, correo, subject, datos) => {
 	else if (tipo === "reject") {
 		email = {
 			from: process.env.NODEMAILER_USER, //remitente
-			to: correo, //destinatario
+			to, //destinatario
 			subject, //asunto del correo
 			text: ` 
             Estimado ${datos.nombre}
@@ -40,8 +39,8 @@ const enviarMail = async (tipo, correo, subject, datos) => {
 		};
 	} else if (tipo === "recordatorio") {
 		email = {
-			from: process.env.NODEMAILER_USER, //remitente
-			to: correo, //destinatario
+			from: de, //remitente
+			to, //destinatario
 			subject, //asunto del correo
 			text: ` 
             Estimad@ ${datos.nombre} ${datos.apellido}:
@@ -50,17 +49,16 @@ const enviarMail = async (tipo, correo, subject, datos) => {
         `,
 		};
 	}
-	let resp;
+
 	await transport.sendMail(email, function (error, info) {
 		if (error) {
 			console.log("Error al enviar email", error);
-			resp = "no";
+			return true;
 		} else {
 			console.log("Correo enviado correctamente a: ", info.accepted);
-			resp = "ok";
+			return false;
 		}
 	});
-	return resp;
 };
 
 module.exports = {
