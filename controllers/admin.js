@@ -4,6 +4,7 @@ const {
 	aceptarSolicitud,
 	rechazarSolicitud,
 	buscarUsuarioPorRutdeClientes,
+	ingresarPagoEfectivo,
 } = require("../database/querys");
 const moment = require("moment");
 const { enviarMail } = require("../helpers/nodemailer");
@@ -99,9 +100,36 @@ const intercambiarBloqueo = async (req, res) => {
 	}
 };
 
+const pagoPresencial=async (req,res) => {
+ 	const body= req.body
+	 const fechaActual = moment().format("DD/MM/YYYY HH:mm");
+	 body[2]=fechaActual
+
+	try {
+		const existeRut= await buscarUsuarioPorRutdeClientes([body.rut])
+	if (existeRut.length===0) {
+		res.status(400).json({
+			ok:false,
+			msg:'Rut no esta registrado como cliente'
+		});
+	} else {
+		await ingresarPagoEfectivo(Object.values(body))
+		return res.status(200).json({
+			ok:true
+		})
+	}
+	} catch (error) {
+		res.status(400).json({
+			ok:false,
+			msg:'Ha ocurrido un error, intente denuevo'
+		});
+	}
+}
+
 module.exports = {
 	traerSolicitudes,
 	traerUsuarios,
 	intercambiarBloqueo,
 	responseRequest,
+	pagoPresencial
 };

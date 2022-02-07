@@ -6,6 +6,7 @@ const {
 	traerUsuarios,
 	intercambiarBloqueo,
 	responseRequest,
+	pagoPresencial,
 } = require("../controllers/admin");
 const { validarJWT } = require("../middlewares/validarJWT");
 const router = Router();
@@ -23,5 +24,9 @@ router.get("/user", traerUsuarios);
 // router.put("/user/:id", traerUsuarios);
 
 router.put("/block", intercambiarBloqueo);
+
+// finanzas
+router.put("/pagopresencial", pagoPresencial);
+
 
 module.exports = router;

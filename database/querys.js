@@ -141,6 +141,21 @@ const changeImg = async (data) => {
 		console.log(error);
 	}
 };
+
+const ingresarPagoEfectivo=async (data) => {
+	console.log(data);
+const query= `INSERT INTO pago
+(fecha_pago, monto, pago_aprobado, medio_pago, id_usuario)
+VALUES($1, $3, true, 'efectivo', (select id_usuario from usuarios where rut=$2));
+`
+
+try {
+	const res= await pool.query(query,data)
+	return res.rows
+} catch (error) {
+	console.log(error);
+}
+}
 module.exports = {
 	actualizarUsuario,
 	buscarUsuarioPorRutdeClientes,
@@ -152,4 +167,5 @@ module.exports = {
 	cambiarFechaBaja,
 	cambiarContraseña,
 	changeImg,
+	ingresarPagoEfectivo
 };
