@@ -148,13 +148,25 @@ const query= `INSERT INTO pago
 (fecha_pago, monto, pago_aprobado, medio_pago, id_usuario)
 VALUES($1, $3, true, 'efectivo', (select id_usuario from usuarios where rut=$2));
 `
-
 try {
 	const res= await pool.query(query,data)
 	return res.rows
 } catch (error) {
 	console.log(error);
 }
+}
+
+const pagoEfectivo=async(array) => {
+const query= `INSERT INTO pago
+(fecha_pago, monto, banco_origen, num_cuenta_origen, num_operacion, pago_aprobado, medio_pago, id_usuario)
+VALUES($6, $1, $4, $3, $2, false, 'transferencia', $5);
+`
+  try {
+	  const res=await pool.query(query,array)
+	  return res.rows
+  } catch (error) {
+	  console.log(error);
+  }
 }
 module.exports = {
 	actualizarUsuario,
@@ -167,5 +179,6 @@ module.exports = {
 	cambiarFechaBaja,
 	cambiarContraseña,
 	changeImg,
-	ingresarPagoEfectivo
+	ingresarPagoEfectivo,
+	pagoEfectivo
 };
