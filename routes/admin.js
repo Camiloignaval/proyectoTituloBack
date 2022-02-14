@@ -7,6 +7,8 @@ const {
 	intercambiarBloqueo,
 	responseRequest,
 	pagoPresencial,
+	solicitudDePago,
+	pagoValidado,
 } = require("../controllers/admin");
 const { validarJWT } = require("../middlewares/validarJWT");
 const router = Router();
@@ -27,6 +29,9 @@ router.put("/block", intercambiarBloqueo);
 
 // finanzas
 router.put("/pagopresencial", pagoPresencial);
+
+router.get("/payrequest", solicitudDePago);
+router.put("/validatepay", pagoValidado);
 
 
 module.exports = router;

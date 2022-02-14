@@ -5,6 +5,8 @@ const {
 	rechazarSolicitud,
 	buscarUsuarioPorRutdeClientes,
 	ingresarPagoEfectivo,
+	selectSolicitudPago,
+	validarPago
 } = require("../database/querys");
 const moment = require("moment");
 const { enviarMail } = require("../helpers/nodemailer");
@@ -126,10 +128,46 @@ const pagoPresencial=async (req,res) => {
 	}
 }
 
+const solicitudDePago =async(req,res) => {
+  try {
+	  const datos=await selectSolicitudPago()
+		return res.status(200).json({
+			ok:true,
+			msg:'datos cargados con exito',
+			datos
+		})	  
+
+} catch (error) {
+	res.status(400).json({
+		ok:false,
+		msg:'Ha ocurrido un error, intente denuevo'
+	});
+  }
+}
+
+const pagoValidado= async(req,res) => {
+const {idPago}=req.body
+  try {
+	 await validarPago([idPago])
+	 return res.status(200).json({
+		ok:true,
+		msg:'Pago aprobado'
+	})	 
+	  
+  } catch (error) {
+	res.status(400).json({
+		ok:false,
+		msg:'Ha ocurrido un error, intente denuevo'
+	});
+  }
+}
+
 module.exports = {
 	traerSolicitudes,
 	traerUsuarios,
 	intercambiarBloqueo,
 	responseRequest,
-	pagoPresencial
+	pagoPresencial,
+	solicitudDePago,
+	pagoValidado
 };

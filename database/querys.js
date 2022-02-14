@@ -104,10 +104,7 @@ const actualizarUsuario = async (data) => {
 };
 
 const cambiarFechaBaja = async (datos) => {
-	const query = `update usuarios
-  SET  fecha_baja_usuario=(select now())
-  WHERE id_usuario=$1;
-  `;
+	const query = `update usuarios SET  fecha_baja_usuario=(select now())WHERE id_usuario=$1;`;
 	try {
 		const res = await pool.query(query, datos);
 		return res.rows;
@@ -168,7 +165,32 @@ VALUES($6, $1, $4, $3, $2, false, 'transferencia', $5);
 	  console.log(error);
   }
 }
+
+const selectSolicitudPago=async () => {
+  const query= 'SELECT id_pago, fecha_pago, monto, banco_origen, num_cuenta_origen, num_operacion, pago_aprobado, medio_pago, id_usuario from pago where pago_aprobado = false;'
+try {
+	const res= await pool.query(query)
+	return res.rows
+} catch (error) {
+	console.log(error)
+}
+}
+
+const validarPago=async(idPago) => {
+	const query=`UPDATE pago
+	SET pago_aprobado=true
+	WHERE id_pago=$1;
+	`
+	try {
+		const res= await pool.query(query,idPago)
+		return res.rows
+	} catch (error) {
+		console.log(error)
+	}
+  console.log(idPago)
+}
 module.exports = {
+	selectSolicitudPago,
 	actualizarUsuario,
 	buscarUsuarioPorRutdeClientes,
 	insertarUsuario,
@@ -180,5 +202,6 @@ module.exports = {
 	cambiarContraseña,
 	changeImg,
 	ingresarPagoEfectivo,
-	pagoEfectivo
+	pagoEfectivo,
+	validarPago
 };
