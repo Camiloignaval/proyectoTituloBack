@@ -66,7 +66,7 @@ const toggleBloqueoUsuario = async (datos) => {
 
 const aceptarSolicitud = async (data) => {
 	const query = `update usuarios
-	  SET solicitud_revisada=true
+	  SET solicitud_revisada=true, fecha_aceptado = $2
 	  WHERE id_usuario=$1;
 	  `;
 	try {
@@ -179,7 +179,7 @@ try {
 const validarPago=async(idPago) => {
 	const query=`UPDATE pago
 	SET pago_aprobado=true
-	WHERE id_pago=$1;
+	WHERE id_pago=$1 returning *;
 	`
 	try {
 		const res= await pool.query(query,idPago)
@@ -187,9 +187,52 @@ const validarPago=async(idPago) => {
 	} catch (error) {
 		console.log(error)
 	}
-  console.log(idPago)
 }
+
+const mesesActivo=async(id) => {
+  const query= 'select fecha_aceptado from usuarios where id_usuario = $1'
+  try {
+	  const res= await pool.query(query,id)
+	  return res.rows[0]
+	  
+  } catch (error) {
+	  console.log(error)
+  }
+}
+
+const updateEstadoFinanciero=async(idUser)=>{
+	const query=`UPDATE usuarios
+	SET estado_financiero = true
+	WHERE id_usuario=$1;
+	`
+	try {
+		const res= await pool.query(query,idUser)
+		return res.rows
+	} catch (error) {
+		console.log(error)
+	}
+
+}
+
+const montoTotalPagadoPorUser= async (idUser)=>{
+	const query= `select sum(p.monto),p2.valor_mensualidad,u.id_usuario  from pago p
+	inner join usuarios u 
+	on u.id_usuario  = p.id_usuario 
+	inner join planes p2 
+	on p2.id_plan = u.id_plan 
+	where p.pago_aprobado = true and u.id_usuario = $1
+	group by (u.id_usuario,p2.valor_mensualidad)`
+	try {
+		const res= await pool.query(query,idUser)
+		return res.rows[0]
+	} catch (error) {
+		console.log(error)
+	}
+}
+
 module.exports = {
+	montoTotalPagadoPorUser,
+	updateEstadoFinanciero,
 	selectSolicitudPago,
 	actualizarUsuario,
 	buscarUsuarioPorRutdeClientes,
@@ -203,5 +246,6 @@ module.exports = {
 	changeImg,
 	ingresarPagoEfectivo,
 	pagoEfectivo,
-	validarPago
+	validarPago,
+	mesesActivo,
 };

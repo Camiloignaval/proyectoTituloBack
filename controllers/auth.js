@@ -88,6 +88,7 @@ const login = async (req, res) => {
 			fecha_baja_usuario,
 			bloqueado,
 			fecha_rechazo_usuario,
+			estado_financiero
 		} = resp[0];
 		const comprobacion = bcrypt.compareSync(password, contraseñaBBDD);
 		// Si solicitud aun no ha sido aprobada
@@ -125,6 +126,7 @@ const login = async (req, res) => {
 					id_cargo,
 					foto,
 					telefono,
+					estado_financiero
 				},
 			});
 			// Si credenciales son incorrectas
