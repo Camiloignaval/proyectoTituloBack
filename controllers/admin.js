@@ -13,6 +13,7 @@ const {
 } = require("../database/querys");
 const moment = require("moment");
 const { enviarMail } = require("../helpers/nodemailer");
+const { updateEstadoFinancieroHelper } = require("../helpers/updateEstadoFinanciero");
 
 const traerSolicitudes = async (req, res) => {
 	try {
@@ -113,18 +114,6 @@ const pagoPresencial=async (req,res) => {
 	try {
 		const existeRut= await buscarUsuarioPorRutdeClientes([body.rut])
 		const {id_usuario}= existeRut[0]
-		const {fecha_aceptado}= await mesesActivo([id_usuario])
-		console.log(id_usuario)
-		// calculando cuandos meses lleva activo
-			const fechaAcept= moment(fecha_aceptado)
-			const fechaHoy=moment()
-			const diff=fechaHoy.diff(fechaAcept,'month')
-			const {sum,valor_mensualidad}= await montoTotalPagadoPorUser([id_usuario])
-			const deberiaLlevarPagado=valor_mensualidad*diff
-		// si lleva pagado mas de lo que deberia
-			if(parseInt(sum)>=deberiaLlevarPagado){
-				await updateEstadoFinanciero([id_usuario])
-			}
 		
 	if (existeRut.length===0) {
 		res.status(400).json({
@@ -133,9 +122,7 @@ const pagoPresencial=async (req,res) => {
 		});
 	} else {
 		await ingresarPagoEfectivo(Object.values(body))
-
-
-
+		updateEstadoFinancieroHelper(id_usuario)
 		return res.status(200).json({
 			ok:true
 		})
@@ -170,19 +157,7 @@ const {idPago}=req.body
 try {
 	const respuesta=await validarPago([idPago])
 	const {id_usuario}=respuesta[0]
-	//  seleccionar fecha aceptado
-	const {fecha_aceptado}= await mesesActivo([id_usuario])
-console.log(id_usuario)
-// calculando cuandos meses lleva activo
-	const fechaAcept= moment(fecha_aceptado)
-	const fechaHoy=moment()
-	const diff=fechaHoy.diff(fechaAcept,'month')
-	const {sum,valor_mensualidad}= await montoTotalPagadoPorUser([id_usuario])
-	const deberiaLlevarPagado=valor_mensualidad*diff
-// si lleva pagado mas de lo que deberia
-	if(parseInt(sum)>=deberiaLlevarPagado){
-		await updateEstadoFinanciero([id_usuario])
-	}
+	updateEstadoFinancieroHelper(id_usuario)
 
 	 return res.status(200).json({
 		ok:true,
@@ -197,7 +172,12 @@ console.log(id_usuario)
   }
 }
 
+const envioEmailAtrasados=async(req,res) => {
+	console.log('enviare un email')
+  
+}
 module.exports = {
+	envioEmailAtrasados,
 	traerSolicitudes,
 	traerUsuarios,
 	intercambiarBloqueo,

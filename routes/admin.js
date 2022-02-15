@@ -9,6 +9,7 @@ const {
 	pagoPresencial,
 	solicitudDePago,
 	pagoValidado,
+	envioEmailAtrasados,
 } = require("../controllers/admin");
 const { validarJWT } = require("../middlewares/validarJWT");
 const router = Router();
@@ -32,6 +33,7 @@ router.put("/pagopresencial", pagoPresencial);
 
 router.get("/payrequest", solicitudDePago);
 router.put("/validatepay", pagoValidado);
+router.get('/pagosatrasados', envioEmailAtrasados)
 
 
 module.exports = router;

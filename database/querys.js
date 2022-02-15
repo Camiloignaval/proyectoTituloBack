@@ -200,13 +200,13 @@ const mesesActivo=async(id) => {
   }
 }
 
-const updateEstadoFinanciero=async(idUser)=>{
+const updateEstadoFinanciero=async(datos)=>{
 	const query=`UPDATE usuarios
-	SET estado_financiero = true
+	SET estado_financiero = $2
 	WHERE id_usuario=$1;
 	`
 	try {
-		const res= await pool.query(query,idUser)
+		const res= await pool.query(query,datos)
 		return res.rows
 	} catch (error) {
 		console.log(error)
