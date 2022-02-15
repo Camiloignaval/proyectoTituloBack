@@ -230,7 +230,29 @@ const montoTotalPagadoPorUser= async (idUser)=>{
 	}
 }
 
+const selectPagos= async (id) => {
+  const query=`select p.fecha_pago ,p.monto,p.medio_pago, p.id_pago, p.pago_aprobado from pago p
+  where p.id_usuario=$1 order by p.fecha_pago desc`
+  try {
+	  const res= await pool.query(query,id)
+	  return res.rows
+  } catch (error) {
+	  
+  }
+}
+
+const selectEstadoFinanciero= async (id) => {
+	const query=`select estado_financiero from usuarios where id_usuario = $1`
+	try {
+		const res= await pool.query(query,id)
+		return res.rows
+	} catch (error) {
+		
+	}
+  }
+
 module.exports = {
+	selectPagos,
 	montoTotalPagadoPorUser,
 	updateEstadoFinanciero,
 	selectSolicitudPago,
@@ -248,4 +270,5 @@ module.exports = {
 	pagoEfectivo,
 	validarPago,
 	mesesActivo,
+	selectEstadoFinanciero
 };

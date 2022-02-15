@@ -1,5 +1,5 @@
 const { Router } = require("express");
-const { ingresarPago } = require("../controllers/user");
+const { ingresarPago, traerPagos } = require("../controllers/user");
 const { validarJWT } = require("../middlewares/validarJWT");
 const router = Router();
 
@@ -9,6 +9,8 @@ const router = Router();
 router.use(validarJWT);
 
 router.post("/pagoefectivo", ingresarPago);
+router.get("/pagos:id", traerPagos);
+
 
 
 
