@@ -21,7 +21,6 @@ const validarEstadoFinanciero = async (req, res, next) => {
       const { sum, valor_mensualidad } = datosPago
       // cuanto deberia llevar total segun meses entrenado
       const deberiaLlevarPagado = valor_mensualidad * diff
-      // console.log('deberia llevar:',deberiaLlevarPagado, 'lleva:',sum)
       // si lleva pagado mas de lo que deberia
       if (parseInt(sum) >= deberiaLlevarPagado) {
         // ('lleva mas')
@@ -31,7 +30,6 @@ const validarEstadoFinanciero = async (req, res, next) => {
         await updateEstadoFinanciero([id_usuario, false])
       }
     } else {
-      console.log('no tiene pagos')
       await updateEstadoFinanciero([id_usuario, false])
     }
   } else {

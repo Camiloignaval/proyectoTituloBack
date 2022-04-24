@@ -269,7 +269,61 @@ const traerTodosLosIdsClientes = async () => {
     console.log(error)
   }
 }
+
+const getEntranadosPorId = async (id) => {
+  const query = 'select id_usuario,nombre,apellido from usuarios where entrenador=$1'
+  try {
+    const res = await pool.query(query, id)
+    return res.rows
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+const traerMailById = async (id) => {
+  const query = 'select email,nombre,apellido from usuarios where id_usuario=$1'
+  try {
+    const res = await pool.query(query, id)
+    return res.rows
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+const datosUsuarioPorId = async (id) => {
+  const query = 'select * from usuarios where id_usuario=$1'
+  try {
+    const res = await pool.query(query, id)
+    return res.rows
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+const getEmailsClientes = async () => {
+  const query = 'select email from usuarios where id_cargo=3'
+  try {
+    const res = await pool.query(query)
+    return res.rows
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+const getEmailsEntrenados = async (id) => {
+  const query = 'select email from usuarios where entrenador=$1'
+  try {
+    const res = await pool.query(query, id)
+    return res.rows
+  } catch (error) {
+    console.log(error)
+  }
+}
 module.exports = {
+  getEmailsEntrenados,
+  getEmailsClientes,
+  datosUsuarioPorId,
+  traerMailById,
   traerTodosLosIdsClientes,
   selectClientesDeudores,
   selectPagos,
@@ -290,5 +344,6 @@ module.exports = {
   pagoEfectivo,
   validarPago,
   mesesActivo,
-  selectEstadoFinanciero
+  selectEstadoFinanciero,
+  getEntranadosPorId
 }

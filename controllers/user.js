@@ -2,6 +2,7 @@ const { pagoEfectivo, selectPagos, selectEstadoFinanciero } = require('../databa
 const moment = require('moment')
 
 const ingresarPago = async (req, res) => {
+  console.log(req.body)
   const body = req.body
   const fechaActual = moment().format('DD/MM/YYYY HH:mm')
   body.fecha = fechaActual

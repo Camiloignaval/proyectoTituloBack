@@ -17,6 +17,7 @@ app.use('/api/auth', require('./routes/auth'))
 app.use('/api/admin', require('./routes/admin'))
 app.use('/api/msg', require('./routes/msg'))
 app.use('/api/user', require('./routes/user'))
+app.use('/api/personal', require('./routes/personal'))
 
 // escuchar peticiones
 app.listen(process.env.PORT, () => {

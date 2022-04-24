@@ -16,14 +16,12 @@ const updateEstadoFinancieroHelper = async (idUser) => {
 
     // si lleva pagado mas de lo que deberia
     if (parseInt(sum) >= deberiaLlevarPagado) {
-      console.log('este usuario esta ok')
       await updateEstadoFinanciero([idUser, true])
     } else {
-      console.log('este usuario esta atrasado')
       await updateEstadoFinanciero([idUser, false])
     }
   } else {
-    console.log('no tiene pagos')
+    // console.log('no tiene pagos')
     await updateEstadoFinanciero([idUser, false])
   }
 }

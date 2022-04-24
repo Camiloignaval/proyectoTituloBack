@@ -48,12 +48,46 @@ const enviarMail = async (tipo, to, subject, datos, de = process.env.NODEMAILER_
     }
   } else if (tipo === 'recordatorio') {
     email = {
-      from: de, // remitente
+      from: process.env.NODEMAILER_USER, // remitente
       to, // destinatario
       subject, // asunto del correo
       text: ` 
             Estimad@ ${datos.nombre} ${datos.apellido}:
             ${datos.mensaje}
+           
+        `
+    }
+  } else if (tipo === 'intercambio') {
+    email = {
+      from: de, // remitente
+      to, // destinatario
+      subject, // asunto del correo
+      text: ` 
+            Estimad@ ${datos.nombre} ${datos.apellido}, este es un mensaje enviado
+            a través de aplicacion MyGym de parte de ${datos.datosRem.nombre} ${datos.datosRem.apellido}:
+          
+            ${datos.message}
+           
+        `
+    }
+  } else if (tipo === 'intercambioMasivoAdmin') {
+    email = {
+      from: de, // remitente
+      to, // destinatario
+      subject, // asunto del correo
+      text: ` 
+            ${datos.message}
+           
+        `
+    }
+  } else if (tipo === 'intercambioMasivoPersonal') {
+    email = {
+      from: de, // remitente
+      to, // destinatario
+      subject, // asunto del correo
+      text: ` 
+      Estimado usuario, este es un mensaje de parte de su entrenador personal:
+            ${datos.message}
            
         `
     }

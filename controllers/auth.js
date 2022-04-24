@@ -91,7 +91,8 @@ const login = async (req, res) => {
       fecha_baja_usuario,
       bloqueado,
       fecha_rechazo_usuario,
-      estado_financiero
+      estado_financiero,
+      entrenador
     } = resp[0]
     const comprobacion = bcrypt.compareSync(password, contraseñaBBDD)
     // Si solicitud aun no ha sido aprobada
@@ -135,7 +136,8 @@ const login = async (req, res) => {
           id_cargo,
           foto,
           telefono,
-          estado_financiero
+          estado_financiero,
+          entrenador
         }
       })
       // Si credenciales son incorrectas
@@ -168,7 +170,8 @@ const revalidarToken = async (req, res) => {
     rut,
     id_cargo,
     foto,
-    telefono
+    telefono,
+    entrenador
   } = data[0]
   res.json({
     ok: true,
@@ -182,7 +185,8 @@ const revalidarToken = async (req, res) => {
       rut,
       id_cargo,
       foto,
-      telefono
+      telefono,
+      entrenador
     }
   })
 }

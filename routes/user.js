@@ -9,7 +9,7 @@ const router = Router()
 // Middleware para todas las rutas
 router.use(validarJWT)
 
-router.post('/pagoefectivo', ingresarPago)
+router.post('/pagotransferencia', ingresarPago)
 router.get('/pagos:id', validarEstadoFinanciero, traerPagos)
 
 module.exports = router
