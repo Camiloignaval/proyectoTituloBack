@@ -301,7 +301,7 @@ const datosUsuarioPorId = async (id) => {
 }
 
 const getEmailsClientes = async () => {
-  const query = 'select email from usuarios where id_cargo=3'
+  const query = 'select email,id_usuario from usuarios where id_cargo=3'
   try {
     const res = await pool.query(query)
     return res.rows
@@ -311,7 +311,7 @@ const getEmailsClientes = async () => {
 }
 
 const getEmailsEntrenados = async (id) => {
-  const query = 'select email from usuarios where entrenador=$1'
+  const query = 'select email,id_usuario from usuarios where entrenador=$1'
   try {
     const res = await pool.query(query, id)
     return res.rows
@@ -319,7 +319,21 @@ const getEmailsEntrenados = async (id) => {
     console.log(error)
   }
 }
+
+const insertLogEmails = async (datos) => {
+  const query = `INSERT INTO public.registros_msj
+  (fecha, usuario_remitente, usuario_destino, masivo)
+  VALUES($1, $2, $3, $4);
+  `
+  try {
+    const res = await pool.query(query, datos)
+    return res.rows
+  } catch (error) {
+    console.log(error)
+  }
+}
 module.exports = {
+  insertLogEmails,
   getEmailsEntrenados,
   getEmailsClientes,
   datosUsuarioPorId,
