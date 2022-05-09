@@ -332,7 +332,81 @@ const insertLogEmails = async (datos) => {
     console.log(error)
   }
 }
+
+const insertHorario = async (datos) => {
+  const query = `INSERT INTO public.horario
+  (dia_semana, hora_apertura, hora_cierre, aforo,cerrado)
+  VALUES($1, $2, $3, $4,$5);
+  `
+  try {
+    const res = await pool.query(query, datos)
+    return res.rows
+  } catch (error) {
+    console.log(error.message)
+  }
+}
+const getHorarios = async (datos) => {
+  const query = `select * from public.horario;
+  `
+  try {
+    const res = await pool.query(query, datos)
+    return res.rows
+  } catch (error) {
+    console.log(error.message)
+  }
+}
+
+const updateHorario = async (datos) => {
+  const query = `UPDATE public.horario
+  SET  hora_apertura=$2, hora_cierre=$3, aforo=$4, cerrado=$5 where dia_semana=$1;
+  `
+  try {
+    const res = await pool.query(query, datos)
+    return res.rows
+  } catch (error) {
+    console.log(error.message)
+  }
+}
+
+const insertBLoqueoHoras = async (data) => {
+  const query = `INSERT INTO public.bloqueo_hora
+  (hora, motivo)
+  VALUES($1, $2);
+  `
+  try {
+    const res = await pool.query(query, data)
+    return res.rows
+  } catch (error) {
+    console.log(error.message)
+  }
+}
+const getBLoqueoHoras = async (data) => {
+  const query = `select * from public.bloqueo_hora;
+  `
+  try {
+    const res = await pool.query(query, data)
+    return res.rows
+  } catch (error) {
+    console.log(error.message)
+  }
+}
+const deleteBLoqueoHoras = async (data) => {
+  const query = `delete from public.bloqueo_hora where id_bloqueo_hora=$1;
+  `
+  try {
+    const res = await pool.query(query, data)
+    return res.rows
+  } catch (error) {
+    console.log(error.message)
+  }
+}
 module.exports = {
+  deleteBLoqueoHoras,
+  getBLoqueoHoras,
+  insertBLoqueoHoras,
+  updateHorario,
+  getHorarios,
+  insertHorario,
   insertLogEmails,
   getEmailsEntrenados,
   getEmailsClientes,

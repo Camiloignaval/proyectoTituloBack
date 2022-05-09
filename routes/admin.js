@@ -7,7 +7,12 @@ const {
   pagoPresencial,
   solicitudDePago,
   pagoValidado,
-  envioEmailAtrasados
+  envioEmailAtrasados,
+  guardarHorarios,
+  obtenerHorarios,
+  guardarHorasBloqueadas,
+  obtenerHorasBloqueadas,
+  eliminarHorasBloqueadas
 } = require('../controllers/admin')
 const { validarJWT } = require('../middlewares/validarJWT')
 const router = Router()
@@ -32,5 +37,14 @@ router.put('/pagopresencial', pagoPresencial)
 router.get('/payrequest', solicitudDePago)
 router.put('/validatepay', pagoValidado)
 router.get('/pagosatrasados', envioEmailAtrasados)
+
+// HORARIOS
+router.post('/schedules', guardarHorarios)
+router.get('/schedules', obtenerHorarios)
+
+// bloqueo horas
+router.post('/hoursblock', guardarHorasBloqueadas)
+router.get('/hoursblock', obtenerHorasBloqueadas)
+router.delete('/hoursblock', eliminarHorasBloqueadas)
 
 module.exports = router

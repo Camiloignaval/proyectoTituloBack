@@ -8,7 +8,13 @@ const {
   ingresarPagoEfectivo,
   selectSolicitudPago,
   validarPago,
-  selectClientesDeudores
+  selectClientesDeudores,
+  insertHorario,
+  getHorarios,
+  updateHorario,
+  insertBLoqueoHoras,
+  getBLoqueoHoras,
+  deleteBLoqueoHoras
 } = require('../database/querys')
 const moment = require('moment')
 const { enviarMail } = require('../helpers/nodemailer')
@@ -183,7 +189,122 @@ const envioEmailAtrasados = async (req, res) => {
     })
   }
 }
+
+const guardarHorarios = async (req, res) => {
+  try {
+    const response = await getHorarios()
+    if (response.length === 0) {
+      Object.values((req?.body)).map(async (d) => {
+        const objetoProv = { ...d }
+        if (objetoProv?.cerrado) {
+          objetoProv.hora_inicio = '00:00'
+          objetoProv.hora_final = '00:00'
+          objetoProv.aforo = '0'
+        }
+        await insertHorario(Object.values(objetoProv))
+      })
+      return res.status(200).json({
+        ok: true,
+        msg: 'Horario guardado con éxito'
+      })
+    } else {
+      Object.values((req?.body)).map(async (d) => {
+        const objetoProv = { ...d }
+        if (objetoProv?.cerrado) {
+          objetoProv.hora_inicio = '00:00'
+          objetoProv.hora_final = '00:00'
+          objetoProv.aforo = '0'
+        }
+        console.log('update', objetoProv)
+        await updateHorario(Object.values(objetoProv))
+      })
+      return res.status(200).json({
+        ok: true,
+        msg: 'Horario actualizado con éxito'
+      })
+    }
+  } catch (error) {
+    console.log(error.message)
+    res.status(400).json({
+      ok: false,
+      msg: 'Ha ocurrido un error, intente denuevo'
+    })
+  }
+}
+
+const obtenerHorarios = async (req, res) => {
+  try {
+    const response = await getHorarios()
+    res.status(200).json({
+      response,
+      ok: true
+    })
+  } catch (error) {
+    console.log(error.message)
+    res.status(400).json({
+      ok: false,
+      msg: 'Ha ocurrido un error, intente denuevo'
+    })
+  }
+}
+
+const guardarHorasBloqueadas = async (req, res) => {
+  const body = req.body
+  try {
+    await insertBLoqueoHoras(Object.values(body))
+    res.status(200).json({
+      ok: true,
+      msg: 'Se han bloqueado las horas exitosamente'
+    })
+  } catch (error) {
+    console.log(error.message)
+    res.status(400).json({
+      ok: false,
+      msg: 'Ha ocurrido un error, intente denuevo'
+    })
+  }
+}
+
+const obtenerHorasBloqueadas = async (req, res) => {
+  try {
+    const response = await getBLoqueoHoras()
+
+    res.status(200).json({
+      response,
+      ok: true,
+      msg: 'Se han bloqueado las horas exitosamente'
+    })
+  } catch (error) {
+    console.log(error.message)
+    res.status(400).json({
+      ok: false,
+      msg: 'Ha ocurrido un error, intente denuevo'
+    })
+  }
+}
+const eliminarHorasBloqueadas = async (req, res) => {
+  try {
+    const response = await deleteBLoqueoHoras(Object.values(req.body))
+    res.status(200).json({
+      response,
+      ok: true,
+      msg: 'Bloqueo eliminado exitosamente'
+    })
+  } catch (error) {
+    console.log(error.message)
+    res.status(400).json({
+      ok: false,
+      msg: 'Ha ocurrido un error, intente denuevo'
+    })
+  }
+}
+
 module.exports = {
+  eliminarHorasBloqueadas,
+  obtenerHorasBloqueadas,
+  guardarHorasBloqueadas,
+  obtenerHorarios,
+  guardarHorarios,
   envioEmailAtrasados,
   traerSolicitudes,
   traerUsuarios,
