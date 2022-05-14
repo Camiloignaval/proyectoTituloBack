@@ -215,7 +215,6 @@ const guardarHorarios = async (req, res) => {
           objetoProv.hora_final = '00:00'
           objetoProv.aforo = '0'
         }
-        console.log('update', objetoProv)
         await updateHorario(Object.values(objetoProv))
       })
       return res.status(200).json({
@@ -251,8 +250,9 @@ const obtenerHorarios = async (req, res) => {
 const guardarHorasBloqueadas = async (req, res) => {
   const body = req.body
   try {
-    await insertBLoqueoHoras(Object.values(body))
+    const response = await insertBLoqueoHoras(Object.values(body))
     res.status(200).json({
+      response,
       ok: true,
       msg: 'Se han bloqueado las horas exitosamente'
     })

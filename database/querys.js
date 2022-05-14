@@ -371,7 +371,7 @@ const updateHorario = async (datos) => {
 const insertBLoqueoHoras = async (data) => {
   const query = `INSERT INTO public.bloqueo_hora
   (hora, motivo)
-  VALUES($1, $2);
+  VALUES($1, $2) returning *;
   `
   try {
     const res = await pool.query(query, data)
@@ -397,7 +397,7 @@ const deleteBLoqueoHoras = async (data) => {
     const res = await pool.query(query, data)
     return res.rows
   } catch (error) {
-    console.log(error.message)
+    throw new Error(error.message)
   }
 }
 module.exports = {
