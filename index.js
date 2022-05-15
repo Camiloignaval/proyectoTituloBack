@@ -1,6 +1,9 @@
 const express = require('express')
 const cors = require('cors')
+const dayjs = require('dayjs')
 require('dotenv').config()
+require('dayjs/locale/es')
+dayjs.locale('es')
 
 const app = express()
 // cors

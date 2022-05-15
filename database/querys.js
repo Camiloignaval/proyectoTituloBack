@@ -400,7 +400,75 @@ const deleteBLoqueoHoras = async (data) => {
     throw new Error(error.message)
   }
 }
+
+const insertReserva = async (data) => {
+  const query = `INSERT INTO public.reservas
+  (id_usuario, fecha, asiste, hora)
+  VALUES($1, $2, false, $3) returning *;
+  `
+  try {
+    const res = await pool.query(query, data)
+    return res.rows[0]
+  } catch (error) {
+    throw new Error(error.message)
+  }
+}
+
+const searchReservedHoursByDay = async (day) => {
+  const query = 'select count(hora),hora from reservas r  where fecha = $1 group by hora '
+  try {
+    const res = await pool.query(query, day)
+    return res.rows
+  } catch (error) {
+    throw new Error(error.message)
+  }
+}
+
+const selectAforoByDay = async (day) => {
+  const query = 'select aforo,hora_apertura,hora_cierre from horario where dia_semana = $1'
+  try {
+    const res = await pool.query(query, day)
+    return res.rows[0]
+  } catch (error) {
+    throw new Error(error.message)
+  }
+}
+const getDaysOff = async () => {
+  const query = 'select dia_semana,hora_apertura,hora_cierre,cerrado from horario'
+  try {
+    const res = await pool.query(query)
+    return res.rows
+  } catch (error) {
+    throw new Error(error.message)
+  }
+}
+const selectReserve = async (datos) => {
+  const query = 'select * from reservas where id_usuario =$1 and fecha >= $2'
+  try {
+    const res = await pool.query(query, datos)
+    return res.rows[0]
+  } catch (error) {
+    throw new Error(error.message)
+  }
+}
+const deletReserve = async (datos) => {
+  const query = `DELETE FROM public.reservas
+  WHERE id_reserva=$1;
+  `
+  try {
+    const res = await pool.query(query, datos)
+    return res.rows[0]
+  } catch (error) {
+    throw new Error(error.message)
+  }
+}
 module.exports = {
+  deletReserve,
+  selectReserve,
+  getDaysOff,
+  selectAforoByDay,
+  searchReservedHoursByDay,
+  insertReserva,
   deleteBLoqueoHoras,
   getBLoqueoHoras,
   insertBLoqueoHoras,
