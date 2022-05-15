@@ -91,6 +91,16 @@ const enviarMail = async (tipo, to, subject, datos, de = process.env.NODEMAILER_
            
         `
     }
+  } else if (tipo === 'cancelHora') {
+    email = {
+      from: de, // remitente
+      to, // destinatario
+      subject, // asunto del correo
+      text: ` 
+      Estimado usuario, debido a un inconveniente, hemos tenido que cancelar su actual reserva de las ${datos.hora}
+           
+        `
+    }
   }
 
   await transport.sendMail(email, function (error, info) {

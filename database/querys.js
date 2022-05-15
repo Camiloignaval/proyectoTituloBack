@@ -474,7 +474,53 @@ const registerAssistance = async (datos) => {
     throw new Error(error.message)
   }
 }
+
+const getReservesHour = async (fecha) => {
+  const query = `SELECT nombre,apellido,  asiste, hora, fecha
+  FROM public.reservas
+  inner join usuarios
+  on usuarios.id_usuario= reservas.id_usuario
+  where fecha= $1
+  order by hora
+  ;
+  `
+  try {
+    const res = await pool.query(query, fecha)
+    return res.rows
+  } catch (error) {
+    console.log(error.message)
+    throw new Error(error.message)
+  }
+}
+
+const selectEmailInConflict = async (hora) => {
+  const query = `select email from reservas
+  inner join usuarios
+  on usuarios.id_usuario=reservas.id_usuario
+  where hora=$1;`
+  try {
+    const res = await pool.query(query, hora)
+    return res.rows
+  } catch (error) {
+    console.log(error.message)
+    throw new Error(error.message)
+  }
+}
+const deleteHoursInConflict = async (hora) => {
+  const query = `delete from reservas
+  where hora=$1;`
+  try {
+    const res = await pool.query(query, hora)
+    return res.rows
+  } catch (error) {
+    console.log(error.message)
+    throw new Error(error.message)
+  }
+}
 module.exports = {
+  deleteHoursInConflict,
+  selectEmailInConflict,
+  getReservesHour,
   registerAssistance,
   deletReserve,
   selectReserve,

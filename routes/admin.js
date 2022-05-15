@@ -13,7 +13,8 @@ const {
   guardarHorasBloqueadas,
   obtenerHorasBloqueadas,
   eliminarHorasBloqueadas,
-  consultAssistance
+  consultAssistance,
+  getReservesHours
 } = require('../controllers/admin')
 const { validarJWT } = require('../middlewares/validarJWT')
 const router = Router()
@@ -50,5 +51,8 @@ router.delete('/hoursblock', eliminarHorasBloqueadas)
 
 // CONSULTAR ASISTENCIA
 router.post('/consultassistance', consultAssistance)
+
+// reservas
+router.get('/reserves:date', getReservesHours)
 
 module.exports = router

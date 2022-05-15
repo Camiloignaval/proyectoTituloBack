@@ -15,7 +15,10 @@ const {
   insertBLoqueoHoras,
   getBLoqueoHoras,
   deleteBLoqueoHoras,
-  registerAssistance
+  registerAssistance,
+  getReservesHour,
+  selectEmailInConflict,
+  deleteHoursInConflict
 } = require('../database/querys')
 const moment = require('moment')
 const { enviarMail } = require('../helpers/nodemailer')
@@ -251,7 +254,16 @@ const obtenerHorarios = async (req, res) => {
 
 const guardarHorasBloqueadas = async (req, res) => {
   const body = req.body
+  const { hora } = body
   try {
+    // revisar si hay usuarios con horas tomadas en la hora bloqueada
+    const emailsHorasEliminadas = await selectEmailInConflict([hora])
+    await deleteHoursInConflict([hora])
+    if (emailsHorasEliminadas.length > 0) {
+      const emails = emailsHorasEliminadas.map(e => e.email)
+      console.log(emails)
+      await enviarMail('cancelHora', emails, 'Anulación de hora', { hora })
+    }
     const response = await insertBLoqueoHoras(Object.values(body))
     res.status(200).json({
       response,
@@ -331,7 +343,32 @@ const consultAssistance = async (req, res) => {
   }
 }
 
+const getReservesHours = async (req, res) => {
+  try {
+    const response = await getReservesHour(Object.values(req.params))
+    console.log(response)
+    if (response.length > 0) {
+      return res.status(200).json({
+        response,
+        ok: true
+      })
+    } else {
+      return res.status(200).json({
+        ok: false,
+        msg: 'No hay registros el dia seleccionado'
+      })
+    }
+  } catch (error) {
+    console.log(error.message)
+    res.status(400).json({
+      ok: false,
+      msg: 'Ha ocurrido un error, intente denuevo'
+    })
+  }
+}
+
 module.exports = {
+  getReservesHours,
   consultAssistance,
   eliminarHorasBloqueadas,
   obtenerHorasBloqueadas,
