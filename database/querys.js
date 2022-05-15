@@ -462,7 +462,20 @@ const deletReserve = async (datos) => {
     throw new Error(error.message)
   }
 }
+
+const registerAssistance = async (datos) => {
+  const query = `UPDATE public.reservas
+  SET asiste=true
+  WHERE id_usuario=(select id_usuario from usuarios u where u.rut =$1 ) and fecha=$2 and hora = $3 and asiste =false returning *;`
+  try {
+    const res = await pool.query(query, datos)
+    return res.rows
+  } catch (error) {
+    throw new Error(error.message)
+  }
+}
 module.exports = {
+  registerAssistance,
   deletReserve,
   selectReserve,
   getDaysOff,

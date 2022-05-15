@@ -14,11 +14,13 @@ const {
   updateHorario,
   insertBLoqueoHoras,
   getBLoqueoHoras,
-  deleteBLoqueoHoras
+  deleteBLoqueoHoras,
+  registerAssistance
 } = require('../database/querys')
 const moment = require('moment')
 const { enviarMail } = require('../helpers/nodemailer')
 const { updateEstadoFinancieroHelper } = require('../helpers/updateEstadoFinanciero')
+const dayjs = require('dayjs')
 
 const traerSolicitudes = async (req, res) => {
   try {
@@ -299,7 +301,38 @@ const eliminarHorasBloqueadas = async (req, res) => {
   }
 }
 
+const consultAssistance = async (req, res) => {
+  const { rut } = req.body
+  const dia = dayjs().format('YYYY-MM-DD')
+  const hora = dayjs().format('HH:00:00')
+  try {
+    const existe = await buscarUsuarioPorRutdeClientes([rut])
+    if (existe.length > 0) {
+      const response = await registerAssistance([rut, dia, hora])
+      if (response.length > 0) {
+        return res.status(200).json({
+          ok: true,
+          msg: 'Ingreso exitoso'
+        })
+      } else {
+        return res.status(200).json({
+          ok: false,
+          msg: 'Usuario sin reserva'
+        })
+      }
+    } else {
+      return res.status(200).json({
+        ok: false,
+        msg: 'Rut no registra como cliente’'
+      })
+    }
+  } catch (error) {
+
+  }
+}
+
 module.exports = {
+  consultAssistance,
   eliminarHorasBloqueadas,
   obtenerHorasBloqueadas,
   guardarHorasBloqueadas,
