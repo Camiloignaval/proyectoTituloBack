@@ -220,6 +220,7 @@ const guardarHorarios = async (req, res) => {
           objetoProv.hora_final = '00:00'
           objetoProv.aforo = '0'
         }
+        console.log(objetoProv)
         await updateHorario(Object.values(objetoProv))
       })
       return res.status(200).json({
