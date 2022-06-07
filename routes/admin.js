@@ -1,4 +1,4 @@
-const { Router } = require('express')
+const { Router } = require("express");
 const {
   traerSolicitudes,
   traerUsuarios,
@@ -14,45 +14,52 @@ const {
   obtenerHorasBloqueadas,
   eliminarHorasBloqueadas,
   consultAssistance,
-  getReservesHours
-} = require('../controllers/admin')
-const { validarJWT } = require('../middlewares/validarJWT')
-const router = Router()
+  getReservesHours,
+  getRoutinesRequest,
+  proccessRoutinesRequest,
+} = require("../controllers/admin");
+const { validarJWT } = require("../middlewares/validarJWT");
+const router = Router();
 
 // BASE /api/admin/
 
 // Middleware para todas las rutas
-router.use(validarJWT)
+router.use(validarJWT);
 
-router.get('/requests', traerSolicitudes)
-router.put('/requests', responseRequest)
+router.get("/requests", traerSolicitudes);
+router.put("/requests", responseRequest);
 
 // router.post("/user", crearUsuario);
-router.get('/user', traerUsuarios)
+router.get("/user", traerUsuarios);
 // router.put("/user/:id", traerUsuarios);
 
-router.put('/block', intercambiarBloqueo)
+router.put("/block", intercambiarBloqueo);
 
 // finanzas
-router.put('/pagopresencial', pagoPresencial)
+router.put("/pagopresencial", pagoPresencial);
 
-router.get('/payrequest', solicitudDePago)
-router.put('/validatepay', pagoValidado)
-router.get('/pagosatrasados', envioEmailAtrasados)
+router.get("/payrequest", solicitudDePago);
+router.put("/validatepay", pagoValidado);
+router.get("/pagosatrasados", envioEmailAtrasados);
 
 // HORARIOS
-router.post('/schedules', guardarHorarios)
-router.get('/schedules', obtenerHorarios)
+router.post("/schedules", guardarHorarios);
+router.get("/schedules", obtenerHorarios);
 
 // bloqueo horas
-router.post('/hoursblock', guardarHorasBloqueadas)
-router.get('/hoursblock', obtenerHorasBloqueadas)
-router.delete('/hoursblock', eliminarHorasBloqueadas)
+router.post("/hoursblock", guardarHorasBloqueadas);
+router.get("/hoursblock", obtenerHorasBloqueadas);
+router.delete("/hoursblock", eliminarHorasBloqueadas);
 
 // CONSULTAR ASISTENCIA
-router.post('/consultassistance', consultAssistance)
+router.post("/consultassistance", consultAssistance);
 
 // reservas
-router.get('/reserves:date', getReservesHours)
+router.get("/reserves:date", getReservesHours);
 
-module.exports = router
+// Rutinas
+
+router.get("/routines", getRoutinesRequest);
+router.put("/routines", proccessRoutinesRequest);
+
+module.exports = router;

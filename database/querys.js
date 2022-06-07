@@ -526,7 +526,7 @@ const deleteHoursInConflict = async (hora) => {
 
 const insertRoutine = async (data) => {
   const query = `INSERT INTO public.rutina
-  ("fecha _creacion",id_creador, nivel)
+  (fecha_creacion,id_creador, nivel)
   VALUES($1, $2, $3) returning id_rutina;
   `;
   try {
@@ -551,7 +551,51 @@ const insertExercises = async (data) => {
     throw error.message;
   }
 };
+
+const selectRoutinesRequest = async (data) => {
+  const query = `select nombre_rutina, r.id_rutina,nombre_ejercicio ,descripcion ,repeticiones ,series ,descanso_segundos ,dia,num_orden ,r.fecha_creacion,nombre,apellido from ejercicio e
+  inner join rutina r on r.id_rutina = e.id_rutina 
+  inner join usuarios u  on u.id_usuario = r.id_creador 
+  where r.fecha_aprobacion is null and r.fecha_eliminacion  is null`;
+  try {
+    const res = await pool.query(query, data);
+    return res.rows;
+  } catch (error) {
+    console.log(error.message);
+    throw new Error(error.message);
+  }
+};
+
+const aproveRoutineRequest = async (datos) => {
+  const query = `UPDATE public.rutina
+  SET fecha_aprobacion=$2
+  WHERE id_rutina=$1;
+  `;
+  try {
+    const res = await pool.query(query, datos);
+    return res.rows;
+  } catch (error) {
+    console.log(error.message);
+    throw new Error(error.message);
+  }
+};
+const rejectRoutineRequest = async (datos) => {
+  const query = `UPDATE public.rutina
+  SET fecha_eliminacion=$2
+  WHERE id_rutina=$1;
+  `;
+  try {
+    const res = await pool.query(query, datos);
+    return res.rows;
+  } catch (error) {
+    console.log(error.message);
+    throw new Error(error.message);
+  }
+};
 module.exports = {
+  aproveRoutineRequest,
+  rejectRoutineRequest,
+  selectRoutinesRequest,
   insertExercises,
   insertRoutine,
   deleteHoursInConflict,
