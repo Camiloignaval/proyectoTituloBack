@@ -417,7 +417,7 @@ const getRoutinesRequest = async (req, res) => {
     } else {
       return res.status(200).json({
         ok: false,
-        msg: "No hay registros el dia seleccionado",
+        msg: "No hay solicitudes de rutinas",
       });
     }
   } catch (error) {

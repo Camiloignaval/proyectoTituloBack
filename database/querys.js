@@ -526,8 +526,8 @@ const deleteHoursInConflict = async (hora) => {
 
 const insertRoutine = async (data) => {
   const query = `INSERT INTO public.rutina
-  (fecha_creacion,id_creador, nivel)
-  VALUES($1, $2, $3) returning id_rutina;
+  (fecha_creacion,id_creador, nivel,nombre_rutina)
+  VALUES($1, $2, $3,$4) returning id_rutina;
   `;
   try {
     const res = await pool.query(query, data);
@@ -592,7 +592,22 @@ const rejectRoutineRequest = async (datos) => {
     throw new Error(error.message);
   }
 };
+
+const selectRutinas = async () => {
+  const query = `select r.nivel, nombre_rutina, r.id_rutina,nombre_ejercicio ,descripcion ,repeticiones ,series ,descanso_segundos ,dia,num_orden ,r.fecha_creacion,nombre,apellido from ejercicio e
+  inner join rutina r on r.id_rutina = e.id_rutina 
+  inner join usuarios u  on u.id_usuario = r.id_creador 
+  where r.fecha_aprobacion is not null and r.fecha_eliminacion  is null`;
+  try {
+    const res = await pool.query(query);
+    return res.rows;
+  } catch (error) {
+    console.log(error.message);
+    throw new Error(error.message);
+  }
+};
 module.exports = {
+  selectRutinas,
   aproveRoutineRequest,
   rejectRoutineRequest,
   selectRoutinesRequest,

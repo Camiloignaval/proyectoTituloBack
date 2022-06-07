@@ -18,9 +18,9 @@ const getEntrenados = async (req, res) => {
 
 const sendRoutine = async (req, res) => {
   const fecha = dayjs().format("YYYY-MM-DD");
-  const { id_entrenador, nivel, info } = req.body;
+  const { id_entrenador, nivel, info, name } = req.body;
   try {
-    const response = await insertRoutine([fecha, id_entrenador, nivel]);
+    const response = await insertRoutine([fecha, id_entrenador, nivel, name]);
     const { id_rutina } = response[0];
     info?.map(async (e) => {
       /* Calling the function insertExercises with an array as a parameter. */
