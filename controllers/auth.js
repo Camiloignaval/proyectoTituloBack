@@ -8,12 +8,16 @@ const {
   changeImg,
   traerTodosLosIdsClientes,
   selectRutinas,
+  insertDeleteRequest,
+  deleteRoutinee,
+  updateDeleteRoutine,
 } = require("../database/querys");
 const bcrypt = require("bcrypt");
 const { generarJWT } = require("../helpers/jwt");
 const {
   updateEstadoFinancieroHelper,
 } = require("../helpers/updateEstadoFinanciero");
+const dayjs = require("dayjs");
 // const { parse } = require("dotenv");
 
 // creacion de usuario en bbdd
@@ -96,6 +100,8 @@ const login = async (req, res) => {
       fecha_rechazo_usuario,
       estado_financiero,
       entrenador,
+      id_rutina,
+      nivel_usuario,
     } = resp[0];
     const comprobacion = bcrypt.compareSync(password, contraseñaBBDD);
     // Si solicitud aun no ha sido aprobada
@@ -143,6 +149,8 @@ const login = async (req, res) => {
           telefono,
           estado_financiero,
           entrenador,
+          id_rutina,
+          nivel_usuario,
         },
       });
       // Si credenciales son incorrectas
@@ -177,6 +185,8 @@ const revalidarToken = async (req, res) => {
     foto,
     telefono,
     entrenador,
+    id_rutina,
+    nivel_usuario,
   } = data[0];
   res.json({
     ok: true,
@@ -192,6 +202,8 @@ const revalidarToken = async (req, res) => {
       foto,
       telefono,
       entrenador,
+      id_rutina,
+      nivel_usuario,
     },
   });
 };
@@ -295,6 +307,9 @@ const getRoutines = async (req, res) => {
         const objRetornar = {
           id_rutina: id,
           fecha_creacion: rutinas[0].fecha_creacion,
+          resolucion: rutinas[0].resolucion,
+          fechaSolEliminacion: rutinas[0].fecha,
+          id_solicitud: rutinas[0].id_solicitud,
           nivel: rutinas[0]?.nivel,
           creador: rutinas[0]?.nombre + " " + rutinas[0]?.apellido,
           nombre: rutinas[0]?.nombre_rutina || "aun no tiene nombre",
@@ -327,7 +342,43 @@ const getRoutines = async (req, res) => {
     });
   }
 };
+
+const deleteRequestRoutine = async (req, res) => {
+  try {
+    const fecha = dayjs().format("YYYY-MM-DD");
+    console.log([...Object.values(req.body), fecha]);
+    await insertDeleteRequest([...Object.values(req.body), fecha]);
+    res.status(200).json({
+      ok: true,
+      msg: "Solicitud de eliminación ingresada",
+    });
+  } catch (error) {
+    res.status(400).json({
+      ok: false,
+      msg: "Ha ocurrido un problema, intente en un momento",
+    });
+  }
+};
+
+const deleteRoutine = async (req, res) => {
+  const { id_rutina, id_solicitud } = req.body;
+  try {
+    await deleteRoutinee([id_solicitud, id_rutina]);
+    await updateDeleteRoutine([id_rutina, dayjs().format("YYYY-MM-DD")]);
+    res.status(200).json({
+      ok: true,
+      msg: "Solicitud de eliminación ingresada",
+    });
+  } catch (error) {
+    res.status(400).json({
+      ok: false,
+      msg: "Ha ocurrido un problema, intente en un momento",
+    });
+  }
+};
 module.exports = {
+  deleteRoutine,
+  deleteRequestRoutine,
   getRoutines,
   modificarImgPerfil,
   darUsuarioDeBaja,

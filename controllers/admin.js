@@ -22,6 +22,7 @@ const {
   selectRoutinesRequest,
   aproveRoutineRequest,
   rejectRoutineRequest,
+  cambiarNivelUser,
 } = require("../database/querys");
 const moment = require("moment");
 const { enviarMail } = require("../helpers/nodemailer");
@@ -230,7 +231,6 @@ const guardarHorarios = async (req, res) => {
           objetoProv.hora_final = "00:00";
           objetoProv.aforo = "0";
         }
-        console.log(objetoProv);
         await updateHorario(Object.values(objetoProv));
       });
       return res.status(200).json({
@@ -272,7 +272,6 @@ const guardarHorasBloqueadas = async (req, res) => {
     await deleteHoursInConflict([hora]);
     if (emailsHorasEliminadas.length > 0) {
       const emails = emailsHorasEliminadas.map((e) => e.email);
-      console.log(emails);
       await enviarMail("cancelHora", emails, "Anulación de hora", { hora });
     }
     const response = await insertBLoqueoHoras(Object.values(body));
@@ -448,7 +447,24 @@ const proccessRoutinesRequest = async (req, res) => {
     });
   }
 };
+
+const changelevel = async (req, res) => {
+  try {
+    await cambiarNivelUser(Object.values(req.body));
+    res.status(200).json({
+      ok: true,
+      msg: "Nivel cambiado con éxito",
+    });
+  } catch (error) {
+    console.log(error.message);
+    res.status(400).json({
+      ok: false,
+      msg: "Ha ocurrido un error, intente denuevo",
+    });
+  }
+};
 module.exports = {
+  changelevel,
   proccessRoutinesRequest,
   getRoutinesRequest,
   getReservesHours,

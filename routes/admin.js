@@ -17,6 +17,7 @@ const {
   getReservesHours,
   getRoutinesRequest,
   proccessRoutinesRequest,
+  changelevel,
 } = require("../controllers/admin");
 const { validarJWT } = require("../middlewares/validarJWT");
 const router = Router();
@@ -61,5 +62,8 @@ router.get("/reserves:date", getReservesHours);
 
 router.get("/routines", getRoutinesRequest);
 router.put("/routines", proccessRoutinesRequest);
+
+// cambiarlvluser
+router.put("/changelevel", changelevel);
 
 module.exports = router;

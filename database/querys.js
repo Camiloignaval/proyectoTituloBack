@@ -594,9 +594,10 @@ const rejectRoutineRequest = async (datos) => {
 };
 
 const selectRutinas = async () => {
-  const query = `select r.nivel, nombre_rutina, r.id_rutina,nombre_ejercicio ,descripcion ,repeticiones ,series ,descanso_segundos ,dia,num_orden ,r.fecha_creacion,nombre,apellido from ejercicio e
+  const query = `select ser.id_solicitud, ser.resolucion,ser.fecha , r.nivel, nombre_rutina, r.id_rutina,nombre_ejercicio ,descripcion ,repeticiones ,series ,descanso_segundos ,dia,num_orden ,r.fecha_creacion,nombre,apellido from ejercicio e
   inner join rutina r on r.id_rutina = e.id_rutina 
-  inner join usuarios u  on u.id_usuario = r.id_creador 
+  inner join usuarios u  on u.id_usuario = r.id_creador
+  full join solicitud_eliminacion_rutina ser on ser.id_rutina =r.id_rutina 
   where r.fecha_aprobacion is not null and r.fecha_eliminacion  is null`;
   try {
     const res = await pool.query(query);
@@ -606,7 +607,82 @@ const selectRutinas = async () => {
     throw new Error(error.message);
   }
 };
+
+const insertDeleteRequest = async (datos) => {
+  const query = `INSERT INTO public.solicitud_eliminacion_rutina
+  (id_rutina,id_entrenador, fecha)
+  VALUES($1,$2,$3);
+  `;
+  try {
+    const res = await pool.query(query, datos);
+    return res.rows;
+  } catch (error) {
+    console.log(error.message);
+    throw new Error(error.message);
+  }
+};
+const deleteRoutinee = async (datos) => {
+  const query = `UPDATE public.solicitud_eliminacion_rutina
+  SET resolucion=true
+  WHERE id_solicitud=$1 and id_rutina=$2;
+  `;
+  try {
+    const res = await pool.query(query, datos);
+    return res.rows;
+  } catch (error) {
+    console.log(error.message);
+    throw new Error(error.message);
+  }
+};
+const updateDeleteRoutine = async (datos) => {
+  const query = `UPDATE public.rutina
+  SET fecha_eliminacion=$2
+  WHERE id_rutina=$1;  
+  `;
+  try {
+    const res = await pool.query(query, datos);
+    return res.rows;
+  } catch (error) {
+    console.log(error.message);
+    throw new Error(error.message);
+  }
+};
+
+const selectRoutineActive = async (datos) => {
+  const query = `UPDATE public.usuarios
+  SET id_rutina=$1
+  WHERE id_usuario=$2;
+  ;  
+  `;
+  try {
+    const res = await pool.query(query, datos);
+    return res.rows;
+  } catch (error) {
+    console.log(error.message);
+    throw new Error(error.message);
+  }
+};
+
+const cambiarNivelUser = async (datos) => {
+  const query = `UPDATE public.usuarios
+  SET nivel_usuario=$1
+  WHERE id_usuario=$2;
+  `;
+  try {
+    const res = await pool.query(query, datos);
+    return res.rows;
+  } catch (error) {
+    console.log(error.message);
+    throw new Error(error.message);
+  }
+};
+
 module.exports = {
+  cambiarNivelUser,
+  selectRoutineActive,
+  updateDeleteRoutine,
+  deleteRoutinee,
+  insertDeleteRequest,
   selectRutinas,
   aproveRoutineRequest,
   rejectRoutineRequest,
