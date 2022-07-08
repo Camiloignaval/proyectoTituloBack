@@ -2,11 +2,11 @@
 const { Pool } = require("pg");
 
 const pool = new Pool({
-  user: "postgres",
-  host: "localhost",
-  password: "Kagrmarukelep92",
-  database: "gimnasio",
-  port: 5432,
+  user: process.env.PGUSER,
+  host: process.env.PGHOST,
+  password: process.env.PGPASSWORD,
+  database: process.env.PGDATABASE,
+  port: process.env.PGPORT,
 });
 
 const buscarUsuarioPorRutdeClientes = async (rut) => {
@@ -24,8 +24,8 @@ const insertarUsuario = async (datos) => {
   try {
     console.log(datos);
     const queryUser = `INSERT INTO public.usuarios
-		(nombre, apellido, fecha_nacimiento, contraseña, email, rut, id_cargo, bloqueado, telefono, calle, num_direccion, piso, depto, id_comuna, solicitud_revisada, foto)
-		VALUES($2,$3, $4, $7, $6, $5, $1, false, $13, $8, $9, $10, $11, (select c.id_comuna from comunas c where c.nombre_comuna=$12), false, 'https://d500.epimg.net/cincodias/imagenes/2016/07/04/lifestyle/1467646262_522853_1467646344_noticia_normal.jpg');
+		(nombre, apellido, fecha_nacimiento, contraseña, email, rut, id_cargo, bloqueado, telefono, calle, num_direccion, piso, depto, id_comuna, solicitud_revisada, foto,nivel_usuario)
+		VALUES($2,$3, $4, $7, $6, $5, $1, false, $13, $8, $9, $10, $11, (select c.id_comuna from comunas c where c.nombre_comuna=$12), false, 'https://d500.epimg.net/cincodias/imagenes/2016/07/04/lifestyle/1467646262_522853_1467646344_noticia_normal.jpg',1);
 		`;
     const res = await pool.query(queryUser, datos);
     return res.rows;
@@ -598,7 +598,7 @@ const selectRutinas = async () => {
   inner join rutina r on r.id_rutina = e.id_rutina 
   inner join usuarios u  on u.id_usuario = r.id_creador
   full join solicitud_eliminacion_rutina ser on ser.id_rutina =r.id_rutina 
-  where r.fecha_aprobacion is not null and r.fecha_eliminacion  is null`;
+  where r.fecha_aprobacion is not null and r.fecha_eliminacion  is null order by num_orden asc;`;
   try {
     const res = await pool.query(query);
     return res.rows;

@@ -1,15 +1,21 @@
-const nodemailer = require('nodemailer')
+const nodemailer = require("nodemailer");
 
-const enviarMail = async (tipo, to, subject, datos, de = process.env.NODEMAILER_USER) => {
+const enviarMail = async (
+  tipo,
+  to,
+  subject,
+  datos,
+  de = process.env.NODEMAILER_USER
+) => {
   const transport = nodemailer.createTransport({
-    service: 'Gmail',
+    service: "Gmail",
     auth: {
       user: process.env.NODEMAILER_USER,
-      pass: process.env.NODEMAILER_PASS
-    }
-  })
-  let email
-  if (tipo === 'acept') {
+      pass: process.env.NODEMAILER_PASS,
+    },
+  });
+  let email;
+  if (tipo === "acept") {
     // SI ES APROBADO
     email = {
       from: `Tu gimnasio! <${process.env.NODEMAILER_USER}>`, // remitente
@@ -18,9 +24,9 @@ const enviarMail = async (tipo, to, subject, datos, de = process.env.NODEMAILER_
       text: ` 
          
            Estimad@ ${datos.nombre}
-           Has sido aceptado para entrar en nuestra aplicación!`
-    }
-  } else if (tipo === 'reject') {
+           Has sido aceptado para entrar en nuestra aplicación!`,
+    };
+  } else if (tipo === "reject") {
     email = {
       from: process.env.NODEMAILER_USER, // remitente
       to, // destinatario
@@ -30,9 +36,9 @@ const enviarMail = async (tipo, to, subject, datos, de = process.env.NODEMAILER_
             Lamentablemente tu solicitud de usuario ha sido rechazada
             Puedes comunicarte con el administrador para mas información
            
-        `
-    }
-  } else if (tipo === 'atrasados') {
+        `,
+    };
+  } else if (tipo === "atrasados") {
     email = {
       from: process.env.NODEMAILER_USER, // remitente
       to, // destinatario
@@ -44,9 +50,9 @@ const enviarMail = async (tipo, to, subject, datos, de = process.env.NODEMAILER_
 
             De antemano muchas gracias!
            
-        `
-    }
-  } else if (tipo === 'recordatorio') {
+        `,
+    };
+  } else if (tipo === "recordatorio") {
     email = {
       from: process.env.NODEMAILER_USER, // remitente
       to, // destinatario
@@ -55,9 +61,9 @@ const enviarMail = async (tipo, to, subject, datos, de = process.env.NODEMAILER_
             Estimad@ ${datos.nombre} ${datos.apellido}:
             ${datos.mensaje}
            
-        `
-    }
-  } else if (tipo === 'intercambio') {
+        `,
+    };
+  } else if (tipo === "intercambio") {
     email = {
       from: de, // remitente
       to, // destinatario
@@ -68,9 +74,9 @@ const enviarMail = async (tipo, to, subject, datos, de = process.env.NODEMAILER_
           
             ${datos.message}
            
-        `
-    }
-  } else if (tipo === 'intercambioMasivoAdmin') {
+        `,
+    };
+  } else if (tipo === "intercambioMasivoAdmin") {
     email = {
       from: de, // remitente
       to, // destinatario
@@ -78,9 +84,9 @@ const enviarMail = async (tipo, to, subject, datos, de = process.env.NODEMAILER_
       text: ` 
             ${datos.message}
            
-        `
-    }
-  } else if (tipo === 'intercambioMasivoPersonal') {
+        `,
+    };
+  } else if (tipo === "intercambioMasivoPersonal") {
     email = {
       from: de, // remitente
       to, // destinatario
@@ -89,9 +95,9 @@ const enviarMail = async (tipo, to, subject, datos, de = process.env.NODEMAILER_
       Estimado usuario, este es un mensaje de parte de su entrenador personal:
             ${datos.message}
            
-        `
-    }
-  } else if (tipo === 'cancelHora') {
+        `,
+    };
+  } else if (tipo === "cancelHora") {
     email = {
       from: de, // remitente
       to, // destinatario
@@ -99,21 +105,21 @@ const enviarMail = async (tipo, to, subject, datos, de = process.env.NODEMAILER_
       text: ` 
       Estimado usuario, debido a un inconveniente, hemos tenido que cancelar su actual reserva de las ${datos.hora}
            
-        `
-    }
+        `,
+    };
   }
 
   await transport.sendMail(email, function (error, info) {
     if (error) {
-      console.log('Error al enviar email', error)
-      return true
+      console.log("Error al enviar email", error);
+      return true;
     } else {
-      console.log('Correo enviado correctamente a: ', info.accepted)
-      return false
+      console.log("Correo enviado correctamente a: ", info.accepted);
+      return false;
     }
-  })
-}
+  });
+};
 
 module.exports = {
-  enviarMail
-}
+  enviarMail,
+};

@@ -367,7 +367,7 @@ const deleteRoutine = async (req, res) => {
     await updateDeleteRoutine([id_rutina, dayjs().format("YYYY-MM-DD")]);
     res.status(200).json({
       ok: true,
-      msg: "Solicitud de eliminación ingresada",
+      msg: "Rutina eliminada",
     });
   } catch (error) {
     res.status(400).json({
